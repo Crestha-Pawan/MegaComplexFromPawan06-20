@@ -1,0 +1,164 @@
+﻿@model FiboOffice.Src.ViewModel.FiscalYearViewModel
+@using FiboInfraStructure;
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index"; }
+
+<style>
+    .btn-success {
+        background-color: #40A214;
+    }
+</style>
+
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <div style="text-align:left">
+                <a class="btn btn-success" asp-action="create" asp-controller="fiscalyear"><i class="feather icon-plus-circle"></i> Create New</a>
+            </div>
+            <hr />
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table class="table table-bordered">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Code
+                                </th>
+                                <th>
+                                    Start Date
+                                </th>
+                                <th>
+                                    End Date
+                                </th>
+                                <th>Status</th>
+                                <th>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.FiscalYears)
+                            {
+                            <tr>
+                                <td>
+                                    @item.FiscalYearName
+                                </td>
+                                <td>
+                                    @item.FiscalYearCode
+                                </td>
+                                <td>
+                                    @item.StartDate.ToNepDate()
+                                </td>
+                                <td>
+                                    @item.EndDate.ToNepDate()
+                                </td>
+                                <td>
+                                    @item.Status
+                                </td>
+                                <td style="text-align:center">
+                                    <div class="overlay-edit">
+                                        <div class="btn-group-sm">
+                                            <a class="btn-sm btn-primary" asp-action="update" asp-controller="fiscalyear" asp-route-id="@item.Id"><i class="ti-pencil-alt"></i></a>
+                                            <a class=" btn-sm btn-danger" href="#!" data-toggle="modal" FiscalYearId="@item.Id" data-target="#myModal"><i class="ti-trash"></i></a>
+                                            @if (item.IsActive())
+                                            {
+                            <a class="btn-sm btn-success" ReferenceType="toggle" data-toggle="modal" FiscalYearId="@item.Id" data-target="#myModal">
+                                <i class="ti-check"></i>
+                            </a> }
+                        else
+                        {
+                            <a class="btn-sm btn-danger" ReferenceType="toggle" data-toggle="modal" FiscalYearId="@item.Id" data-target="#myModal">
+                                <i class="ti-close"></i>
+                            </a>}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" id="DeleteBody">
+
+        <!-- /.modal-content -->
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@section Scripts
+    {
+    <script type="text/javascript">
+        $("#myModal").on('show.bs.modal', function (ke)
+        {
+            const fyId = $(ke.relatedTarget).attr('FiscalYearId');
+            const type = $(ke.relatedTarget).attr('ReferenceType');
+            var url = '@Url.Action("Delete","FiscalYear")' + "?id=" + fyId;
+            if (fyId > 0) {
+                if (type == null) {
+                    var url = '@Url.Action("Delete","FiscalYear")' + "?id=" + fyId;
+                    $("#DeleteBody").load(url, function () {
+
+                        $("#myModal").modal('show');
+                    });
+                }
+                else {
+                    if (type == "crud") {
+                        var url = '@Url.Action("Update","FiscalYear")' + "?id=" + fyId;
+                        $("#DeleteBody").load(url, function () {
+
+                            $("#myModal").modal('show');
+                        });
+                    }
+                    else if (type == "toggle") {
+                        var url = '@Url.Action("ToggleStatus", "FiscalYear")' + "?id=" + fyId;
+                        $("#DeleteBody").load(url, function () {
+
+                            $("#myModal").modal('show');
+                        });
+                    }
+                }
+            }
+            else {
+                var url = '@Url.Action("Create","FiscalYear")';
+                $("#DeleteBody").load(url, function () {
+
+                    $("#myModal").modal('show');
+                });
+            }
+        })
+    </script>
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@if (ViewBag.Message != null)
+{
+<script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(message) {
+            $.notify({
+                message: message,
+                type: 'inverse',
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: { from: 'bottom', align: 'right' },
+                delay: 2500,
+                animate: { enter: 'animated fadeInRight', exit: 'animated fadeOutRight' },
+                offset: { x: 30, y: 30 }
+            });
+        };
+        /**/
+        notify('@ViewBag.Message');
+    /**/
+    });
+</script>}

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="InfraStructure\Assembler\IElectricityFineSetup.cs" />
+    <Compile Remove="InfraStructure\Repository\IFineSetupService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FiboInfraStructure\FiboInfraStructure.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,102 @@
+﻿@model FiboParty.Src.ViewModel.LedgerViewModel
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+
+@inject FiboParty.Infrastructure.Repository.IPartyRepository _partyrepo;
+    int sn = 1;
+    }
+
+
+<script type="text/javascript">
+    function CallPrint(strid) {
+        var mywindow = document.getElementById('profile');
+        var popupWin = window.open('', "Kaamana Format", 'width=350,height=150,location=no,left=200px');
+
+        popupWin.document.open();
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css"  href="../Content/bootstrap.min.css" /></head><body onload="window.print()">')
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css" href="../Content/print.css" /></head><body onload="window.print()">')
+        popupWin.document.write(mywindow.innerHTML);
+        popupWin.document.write('</html>');
+
+        popupWin.document.close();
+
+    }</script>
+@using (Html.BeginForm("ClientList", "PartyLedger", FormMethod.Get, new { @class = "form-view-data" }))
+{
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6">
+                    <label for="ClientName">Client Name<br /><span style="color:red" id="message"></span></label><br />
+                    @*<select asp-for="ClientId" asp-items="Model.ClientSelectList" class=" form-control ClientId" required></select>*@
+                    <div class="invalid-feedback">
+                        Please Enter A Client Name.
+                    </div>
+                </div>
+                <div class="btn btn-group">
+                    <button type="submit" class="btn btn-success"><i class="ti-filter">Search</i></button>
+                    <button type="button" class="btn"
+                            style=" background-color: darkblue; padding-top: 10px; padding-bottom: 10px; padding-left: 5px; color: white; font-weight: bold;"
+                            onclick="CallPrint('strid')" data-ma-action="print">
+                        <i class="mdi mdi-cloud-print"></i> Print
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>}
+<div class="col-sm-12" id="profile">
+    <div class="card">
+        <div class="card-body">
+            <h4>Client Ledger</h4>
+            <hr />
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table class="table table-bordered table-striped" BORDER="1" width="100%">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+                                <th>
+                                    SN
+                                </th>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Parties)
+                            {
+                                //var party = await _partyrepo.GetByIdAsync((long)item.PartyId);
+                            <tr>
+                                <td>
+                                    @sn
+                                </td>
+                                <td>
+                                    @item.Name
+                                </td>
+                                <td class="btn-group btn-group-sm">
+                                    <a type="button" class=" btn-icon btn-sm btn-secondary" asp-action="PartyDetails" asp-controller="Ledger" asp-route-id="@item.Id"><i class="ti-eye" data-toggle="tooltip" title="Ledger"></i></a>
+                                </td>
+                            </tr>
+                                sn++;
+
+}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@section Scripts
+{
+
+}

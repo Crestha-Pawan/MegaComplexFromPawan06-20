@@ -1,0 +1,210 @@
+﻿@model FiboBlock.Src.Dto.ElectricityUnitSetupDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form asp-action="Create" asp-controller="ElectricityUnitSetup" method="post" class="needs-validation" novalidate>
+    @Html.AntiForgeryToken()
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6">
+                    <label for="Month">Month<span style="color:red">*</span></label><br />
+                    <select type="text" asp-items="Model.MonthList" asp-for="MonthId" class="select2 custom-select form-control" id="Month" required autocomplete="off"></select>
+                    <div class="invalid-feedback">
+                        Please Enter A Month.
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <label for="Year">Year<span style="color:red">*</span></label><br />
+                    <select asp-for="YearId" asp-items="Model.YearList" class="YearId form-control" required autocomplete="off"></select>
+                    <div class="invalid-feedback">
+                        Please Enter A Year.
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="table">
+                        <thead>
+                            <tr>
+                                <td colspan="12">
+                                    <a class="btn  btn-success btnPlus" type="button" style="color:white"><i class="ti-plus"></i>Add Row</a>
+                                </td>
+                            </tr>
+                            <tr style="background-color: #4CAF50; color: white; height: 2px; line-height: 2px; text-align: center">
+                                <th>Client</th>
+                                <th>Block</th>
+                                <th>Room</th>
+                                <th style="width: 10%;">Previous Unit</th>
+                                <th style="width: 10%;">Current Unit</th>
+                                <th style="width: 8%;">Unit</th>
+                                <th style="width: 8%;">Rate</th>
+                                <th style="width: 10%;">Amount</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="form-group">
+                    <div class="col-md-12" style="text-align:right">
+                        <button type="submit" class="btn btn-success" id="btnSubmit"><i class="ti-check"></i>Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+@section Scripts
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function newRow() {
+                var count = $('.listrow').length;
+                var row =
+                    '<tr class="listrow">' +
+                    '<td><select name="ElectricityDtos[' + count + '].ClientId" class="ClientId form-control style="height:30px;width:200%"" >@foreach (var item in Model.Clients) {<option value="@item.Id">@item.OwnerName</option>}</select></td>' +
+                    '<td><select name="ElectricityDtos[' + count + '].BlockId" class="BlockId form-control" style="height:30px;width:100%">@foreach (var item in Model.Blocks) {<option value="@item.Id">@item.Name</option>}</select></td>' +
+                   '<td><select name="ElectricityDtos[' + count + '].RoomId" class="RoomId form-control" style="height:30px;width:100%">@foreach (var item in Model.Rooms) {<option value="@item.Id">@item.Name</option>}</select></td>' +
+                   '<td><input type="text" name="ElectricityDtos[' + count + '].PreviousUnit" class="form-control PreviousUnit" " onkeyup="Amount(this,event)" /></td>' +
+                    '<td><input type="text" name="ElectricityDtos[' + count + '].CurrentUnit" class="form-control CurrentUnit"  onkeyup="Amount(this,event)" /></td>' +
+                    '<td><input type="text" name="ElectricityDtos[' + count + '].Unit"  class="form-control Unit" onkeyup="Amount(this,event)" /></td>' +
+                    '<td><input type="text" name="ElectricityDtos[' + count + '].Rate"  class="form-control Rate"  onkeyup="Amount(this,event)" /></td>' +
+                    '<td><input type="text" name="ElectricityDtos[' + count + '].Amount" class="form-control Amount" /></td>' +
+
+                    '<td style="text-align:center"><a href="#!" class="BtnMinus  btn-icon btn-sm btn-danger " value="x" > <i class="ti-trash"> </i></td>' +
+                    '</tr>'
+                $("#table").append(row);
+                loadUnit();
+                $(function () {
+                    $(".ClientId").change();
+                });
+            }
+            $("#table").on("click", ".btnPlus", newRow);
+
+            function deleteRow() {
+                var par = $(this).parent().parent();
+                par.remove();
+            };
+
+            $("#table").on("click", ".BtnMinus", deleteRow);
+
+        })
+
+
+    </script>
+
+    <script type="text/javascript">
+        $(Document).ready(function () {
+            $(function () {
+                LoadYear();
+            });
+        });
+        function LoadYear() {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: '@Url.Action("LoadFiscalYear", "Billing")',
+                error: function () {
+
+                },
+                success: function (yearId) {
+                    $("#YearId").val(yearId);
+                }
+            });
+        }
+    function loadUnit() {
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: '@Url.Action("LoadUnit", "ElectricityUnitSetup")',
+            error: function () {
+
+            },
+            success: function (datathis) {
+                var unit = datathis;
+                $('.Rate').each(function () {
+                    $(this).val(unit);
+                });
+            }
+        });
+        }
+        $('#table tbody').on('change', '.ClientId', function () {
+            var row = $(this).closest('tr');
+            var clientId = row.find('.ClientId').val();
+            $.ajax({
+            data: { Id: clientId },
+            dataType: "Json",
+            type: "GET",
+            url: '@Url.Action("LoadRoomBlock", "Billing")',
+                success: function (rooms) {
+                    row.find('.BlockId').empty();
+                    let i = 0;
+                    for (var room in rooms) {
+                        var html = '<option value="' + rooms[i].id + '">' + rooms[i].name + '</option>';
+                        row.find('.BlockId').append(html);
+                        i++;
+                    }
+                    $(".BlockId").change();
+                    //row.find('.RoomId').val(client.roomId);
+                    //row.find('.BlockId').val(client.blockId);
+                }
+            })
+        })
+
+        $('#table tbody').on('change', '.BlockId', function () {
+            var row = $(this).closest('tr');
+            var clientId = row.find('.ClientId').val();
+            var blockId = row.find('.BlockId').val();
+            $.ajax({
+            data: { Id: clientId, blockId: blockId },
+            dataType: "Json",
+            type: "GET",
+            url: '@Url.Action("LoadRoom", "Billing")',
+                success: function (rooms) {
+                    row.find('.RoomId').empty();
+                    let i = 0;
+                    for (var room in rooms) {
+                        var html = '<option value="' + rooms[i].id + '">' + rooms[i].name + '</option>';
+                        row.find('.RoomId').append(html);
+                        i++;
+                    }
+
+                }
+            })
+        })
+
+
+    $('#table tbody').on('change', '.CurrentUnit', function () {
+        var row = $(this).closest('tr');
+        var previousUnit = row.find('.PreviousUnit').val();
+        var currentUnit = row.find('.CurrentUnit').val();
+        var rate = row.find('.Rate').val();
+        if (previousUnit > 0 && currentUnit > 0) {
+            var unit = parseFloat(currentUnit) - parseFloat(previousUnit);
+            row.find('.Unit').val(unit);
+            var total = unit * rate;
+            row.find('.Amount').val(total);
+        }
+    })
+    $('#table tbody').on('change', '.PreviousUnit', function () {
+        var row = $(this).closest('tr');
+        var previousUnit = row.find('.PreviousUnit').val();
+        var currentUnit = row.find('.CurrentUnit').val();
+        if (previousUnit > 0 && currentUnit > 0) {
+            var unit = parseFloat(currentUnit) - parseFloat(previousUnit);
+            row.find('.Unit').val(unit);
+            var total = unit * rate;
+            row.find('.Amount').val(total);
+        }
+    })
+
+    </script>
+
+}

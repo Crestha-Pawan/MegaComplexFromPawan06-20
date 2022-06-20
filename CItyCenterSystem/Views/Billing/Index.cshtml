@@ -1,0 +1,202 @@
+﻿@model FiboBilling.Src.ViewModel.BillingViewModel
+@{Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+    string YearMonth = string.Empty;
+
+}
+@using FiboInfraStructure;
+@inject FiboBlock.InfraStructure.Repository.IClientRepository _clientRepo;
+@inject FiboBlock.InfraStructure.Repository.IBlockRepository _blockRepo;
+@inject FiboBlock.InfraStructure.Repository.IRoomRepository _roomRepo;
+@inject FiboOffice.InfraStructure.Repository.IYearRepository _yearRepo;
+@inject FiboOffice.InfraStructure.Repository.IMonthRepository _monthRepo;
+
+    <script type="text/javascript">
+        function CallPrint(strid) {
+            var mywindow = document.getElementById('profile');
+            var popupWin = window.open('', "Kaamana Format", 'width=350,height=150,location=no,left=200px');
+
+            popupWin.document.open();
+            popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css"  href="../Content/bootstrap.min.css" /></head><body onload="window.print()">')
+            popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css" href="../Content/print.css" /></head><body onload="window.print()">')
+            popupWin.document.write(mywindow.innerHTML);
+            popupWin.document.write('</html>');
+
+            popupWin.document.close();
+
+        }
+
+    </script>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                @using (Html.BeginForm("Index", "Billing", FormMethod.Get, new { @class = "form-view-data" }))
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <label>From Date</label>
+                                    @Html.TextBoxFor(x => x.FromMiti, "{0:yyyy/MM/dd }", new { @class = "form-control nepali-datepicker", @placeholder = "yyyy/MM/dd", @autocomplete = "off" })
+                                </div>
+                                <div class="col-lg-3">
+                                    <label>To Date</label>
+                                    @Html.TextBoxFor(x => x.ToMiti, "{0:yyyy/MM/dd }", new { @class = "form-control nepali-datepicker", @placeholder = "yyyy/MM/dd", @autocomplete = "off" })
+                                </div>
+                                <div class="col-lg-3">
+                                    <label for="ClientName">Client Name<br /><span style="color:red" id="message"></span></label><br />
+                                    <select asp-for="ClientId" asp-items="Model.ClientList" class="select2 custom-select form-control ClientId">
+                                        <option value="0">--Select--</option>
+                                    </select>
+                                </div>
+                                <div class="btn btn-group">
+                                    <button type="submit" class="btn btn-success">Search</button>
+                                    <button type="button" class="btn btn-success"
+                                            style="background-color:darkblue;color:white;font-weight:bold"
+                                            onclick="CallPrint('strid')" data-ma-action="print">
+                                        <i class="mdi mdi-cloud-print"></i> Print
+                                    </button>
+                                    @*<button type="button" class="btn btn-secondary" style="float: right" 
+                                            onclick="window.location.href = '@Url.Action("ExportToExcel","Billing")'">Export Excel</button>*@
+                                </div>
+                            </div>
+                        </div>  
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div style="text-align:left">
+                    <a class="btn btn-success" asp-action="Create" asp-controller="Billing"><i class="ti-plus"></i> Create New</a>
+                </div>
+                <hr />
+                <div class="table-responsive" id="profile">
+                    <div class="tableFixHead">
+                        <table class="table table-bordered table-striped" BORDER="1" width="100%">
+                            <thead style="background-color: #FFFFFFCC;">
+                                <tr>
+                                    <th>
+                                        Year/Mont/Day
+                                    </th>
+                                    <th>
+                                        Client
+                                    </th>
+                                    <th>
+                                        Block
+                                    </th>
+                                    <th>
+                                        Room
+                                    </th>
+                                    <th>Total</th>
+                                    <th>Cash Received</th>
+                                    <th>Due Paid</th>
+                                    <th style="text-align:center">
+                                        Action Name
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.BillingList)
+                                {
+                                    var client = await _clientRepo.GetByIdAsync((long)item.ClientId);
+                                    //var block = await _blockRepo.GetByIdAsync((long)item.BlockId);
+                                    //var room = await _roomRepo.GetByIdAsync((long)item.RoomId);
+
+                                    <tr>
+                                        <td>
+                                            @foreach (var _detail in Model.BillingDetailList.Where(x => x.BillingId == item.Id).ToList())
+                                            {
+                                                string date = item.DueDate.ToNepDate();
+                                                string day = date.Split("-")[2];
+                                                var year = await _yearRepo.GetByIdAsync((long)_detail.YearId);
+
+                                                var month = await _monthRepo.GetByIdAsync((long)_detail.MonthId);
+                                                YearMonth = string.Format("{0}/{1}/{2}", year.YearName, month.MonthName, day);
+                                                @YearMonth
+                                                <br /><br />
+                                            }
+                                        </td>
+                                        <td>
+                                            @client.OwnerName
+                                        </td>
+                                        <td>
+                                            @if (Model.BillingDetailList.Count > 0)
+                                            {
+                                                string blockName = string.Empty;
+                                                foreach (var _detail in Model.BillingDetailList.Where(x => x.BillingId == item.Id).Select(o => o.BlockId).Distinct().ToList())
+                                                {
+                                                    var block = await _blockRepo.GetByIdAsync((long)_detail);
+                                                    blockName += @block.Name + ",";
+                                                }
+                                                @blockName
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (Model.BillingDetailList.Count > 0)
+                                            {
+                                                string roomName = string.Empty;
+                                                foreach (var _detail in Model.BillingDetailList.Where(x => x.BillingId == item.Id).Select(o => o.RoomId).Distinct().ToList())
+                                                {
+                                                    var room = await _roomRepo.GetByIdAsync((long)_detail);
+                                                    roomName += @room.Name + ",";
+                                                }
+                                                @roomName
+                                            }
+                                        </td>
+                                        <td>@item.GrandTotal</td>
+                                        <td>@item.CashReceived</td>
+                                        <td>@item.DuePaid</td>
+                                        <td style="text-align:center">
+                                            <div class="overlay-edit">
+                                                <a type="button" class=" btn-icon btn-sm btn-primary" asp-action="Update" asp-controller="Billing" asp-route-id="@item.Id"><i class="ti-pencil-alt"></i></a>
+                                                <a type="button" class=" btn-icon btn-sm btn-secondary" asp-action="BillPrint" asp-controller="Billing" asp-route-id="@item.Id">
+                                                    <i class="ti-eye" data-toggle="tooltip" title="View"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @section Scripts
+{
+
+    }
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(message,type) {
+            $.growl({
+                message: message
+            }, {
+                type: type,
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {from: 'top', align: 'right'},
+                delay: 2500,
+                animate: { enter: 'animated rotateIn', exit: 'animated rotateIn'},
+                offset: {x: 30,y: 30}
+            });
+        };
+        notify('@ViewBag.Message','success');
+    });
+
+        </script>
+    }
+

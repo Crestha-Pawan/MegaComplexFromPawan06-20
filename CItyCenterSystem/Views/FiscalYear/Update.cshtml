@@ -1,0 +1,75 @@
+﻿@model FiboOffice.Src.Dto.FiscalYearDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Create";
+}
+
+<form asp-action="Update" asp-controller="FiscalYear" method="post" class="needs-validation" novalidate>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Status" />
+    <input type="hidden" asp-for="FiscalYearCode" />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Update Fiscal Year</h4>
+                    <hr />
+                </div>
+                <div class="card-body">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="Name">Start Date<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="StartDate" class="form-control nepali-datepicker" id="StartDate" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Start Date.
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="Name">End Date<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="EndDate" class="form-control nepali-datepicker" id="EndDate" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A End Date.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="form-group">
+                        <div class="col-md-12" style="text-align:right">
+                            <button type="submit" class="btn  btn-success"><i class="feather icon-check-square"></i> Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(message) {
+            $.notify({
+                message: message,
+                type: 'danger',
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-danger',
+                placement: { from: 'bottom', align: 'right' },
+                delay: 2500,
+                animate: { enter: 'animated fadeInRight', exit: 'animated fadeOutRight' },
+                offset: { x: 30, y: 30 }
+            });
+        };
+        /**/
+        notify('@ViewBag.Message');
+    /**/
+    });
+    </script>
+}

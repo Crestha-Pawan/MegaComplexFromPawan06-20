@@ -1,0 +1,113 @@
+﻿@model FiboBlock.Src.ViewModel.ClientBlockRoomSetupViewModel
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index"; }
+@inject FiboBlock.InfraStructure.Repository.IBlockRepository _blockrepo;
+@inject FiboBlock.InfraStructure.Repository.IRoomRepository _roomrepo;
+@inject FiboBlock.InfraStructure.Repository.IClientRepository _clientrepo;
+
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <a class="btn btn-success" asp-action="Create" asp-controller="ClientBlockRoomSetup"><i class="ti-plus"></i> Create New</a>
+            <hr />
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table class="table table-bordered">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+                                <th>
+                                    Client Name
+                                </th>
+                                <th>
+                                    Block No
+                                </th>
+                                <th>
+                                    Room No
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ClientBlockRoomSetups)
+                            {
+                                var block = await _blockrepo.GetByIdAsync((long)item.BlockId);
+                                var client = await _clientrepo.GetByIdAsync((long)item.ClientId);
+                                <tr>
+                                    <td>
+                                        @client.OwnerName
+                                    </td>
+                                    <td>
+                                        @block.Name
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.RoomId))
+                                        { 
+                                            string[] list = item.RoomId.Split(",");
+                                            foreach (var id in list)
+                                            {
+                                                var room = await _roomrepo.GetByIdAsync(long.Parse(id));
+                                                @room.Name
+                                                <br /><br />
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(message,type) {
+            $.growl({
+                message: message
+            }, {
+                type: type,
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {from: 'top', align: 'right'},
+                delay: 2500,
+                animate: { enter: 'animated rotateIn', exit: 'animated rotateIn'},
+                offset: {x: 30,y: 30}
+            });
+        };
+        notify('@ViewBag.Message','success');
+    });
+
+    </script>
+}
+
+@if (ViewBag.Messege != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(messege,type) {
+            $.growl({
+                message: messege
+            }, {
+                type: type,
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {from: 'top', align: 'right'},
+                delay: 2500,
+                animate: { enter: 'animated rotateIn', exit: 'animated rotateIn'},
+                offset: {x: 30,y: 30}
+            });
+        };
+        notify('@ViewBag.Messege','danger');
+    });
+
+    </script>
+}

@@ -1,0 +1,247 @@
+﻿@model Payroll.Src.Dto.SalarySheetDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "AddSalary";
+    decimal? _advsalary = 0;
+    var salarysheet = await _salaryrepos.GetAllSalarySheetAsync();
+    var salary = salarysheet.Where(x => x.EmployeeId == Model.EmployeeId).ToList();
+    var advancesalary = salarysheet.Where(x => x.EmployeeId == Model.EmployeeId && x.IsAdvance == true).ToList();
+}
+@using FiboInfraStructure;
+@inject Payroll.InfraStructure.Repository.ISalarySheetRepository _salaryrepos;
+@inject Payroll.InfraStructure.Repository.IEmployeeRepository _employeerepos;
+<form asp-action="AddSalary" asp-controller="Employee" method="post" class="needs-validation" novalidate>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="EmployeeId" />
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Add Salary</h4>
+                    <hr />
+                </div>
+                <div class="card-body">
+                    <div>
+                        @foreach (var item in advancesalary)
+                        {
+                            _advsalary += item.AdvanceSalary.ToDecimal();
+                        }
+                      
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="EmployeeId">Employee Name<span style="color:red">*</span></label><br />
+                                <select asp-for="EmployeeId" asp-items="Model.EmployeeList" class="select2 custom-select form-control" id="EmployeeId" disabled required></select>
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Date<span style="color:red">*</span></label><br />
+                                <input asp-for="AdvanceSalaryDate" class="form-control nepali-datepicker" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="SalaryId">Basic Salary<span style="color:red">*</span></label><br />
+                                <input asp-for="BasicSalary" class="form-control" id="Salary" readonly required />
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Housing<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="Housing" id="housing" class="form-control" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Salary.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="Tax">Kosh<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="Kosh" class="form-control" id="kosh" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Tax.
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="Bonus">Advance Salary<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="@_advsalary" class="form-control" id="advancesalary" readonly required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Bonus.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label>Others Deduction<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="Deduction" class="form-control" id="deduction" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Bonus.
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label> Travel Allowance<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="TravelAllowance" class="form-control" id="travelallowance" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Date.
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label>Bonus<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="Bonus" class="form-control" id="bonus" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Date.
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="NetSalary">Special Allowance<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="SpecialAllowance" id="specialallowance" class="form-control" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Net Salary.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="NetSalary">Telephone Allowance<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="TelephoneAllowance" class="form-control" id="telephoneallowance" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Net Salary.
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="NetSalary">Overtime Allowance<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="OvertimeAllowance" class="form-control" id="overtimeallowance" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Net Salary.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="NetSalary">Loan<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="Loan" class="form-control" id="loan" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Net Salary.
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="NetSalary">NetSalary<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="NetSalary" class="form-control" id="NetSalary" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Net Salary.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="form-group">
+                            <div class="col-md-12" style="text-align:right">
+                                <button type="submit" class="btn  btn-success" id="btnSubmit"><i class="feather mr-2 icon-check-square"></i>Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            CalcTotalExpense();
+            $("#Salary").on("keyup", function () {
+                CalcTotalExpense();
+            });
+            $("#kosh").on("keyup", function () {
+                CalcTotalExpense();
+            });
+            $("#advancesalary").on('keyup', function () {
+                CalcTotalExpense();
+            });
+            $("#deduction").on('keyup', function () {
+                CalcTotalExpense();
+            });
+            $("#bonus").on('keyup', function () {
+                CalcTotalExpense();
+            });
+            $("#housing").on('keyup', function () {
+                CalcTotalExpense();
+            });
+            $("#travelallowance").on('keyup', function () {
+                CalcTotalExpense();
+            });
+            $("#specialallowance").on('keyup', function () {
+                CalcTotalExpense();
+            });
+            $("#telephoneallowance").on('keyup', function () {
+                CalcTotalExpense();
+            });
+            $("#overtimeallowance").on('keyup', function () {
+                CalcTotalExpense();
+            });
+            $("#loan").on('keyup', function () {
+                CalcTotalExpense();
+            });
+        });
+        function CalcTotalExpense() {
+            var fa = $("#Salary").val();
+            var ra = $("#kosh").val();
+            var ad = $("#advancesalary").val();
+            var de = $("#deduction").val();
+            var b = $("#bonus").val();
+            var housing = $("#housing").val();
+            var travel = $("#travelallowance").val();
+            var special = $("#specialallowance").val();
+            var telephone = $("#telephoneallowance").val();
+            var overtime = $("#overtimeallowance").val();
+            var loan = $("#loan").val();
+            if (fa.length > 0 && housing.length > 0 && ra.length > 0 && ad.length > 0 && de.length > 0 && b.length > 0 && travel.length > 0 && special.length > 0 && telephone.length > 0 && telephone.length > 0 && overtime.length > 0 && loan.length > 0) {
+                var expense = parseFloat(fa) - parseFloat(ra) - parseFloat(de) - parseFloat(ad) + parseFloat(b) + parseFloat(housing) +
+                    parseFloat(travel) + parseFloat(special) + parseFloat(telephone) + parseFloat(overtime) - parseFloat(loan);
+                $("#NetSalary").val(expense.toFixed(2));
+
+            }
+
+        }
+
+        function CalcNetSaving() {
+            var fa = $("#Salary").val();
+            var ra = $("#kosh").val();
+            var ad = $("#advancesalary").val();
+            var de = $("#deduction").val();
+            var b = $("#bonus").val();
+            var housing = $("#housing").val();
+            var travel = $("#travelallowance").val();
+            var special = $("#specialallowance").val();
+            var telephone = $("#telephoneallowance").val();
+            var overtime = $("#overtimeallowance").val();
+            var loan = $("#loan").val();
+            if (fa.length > 0 && housing.length > 0 && ra.length > 0 && ad.length > 0 && de.length > 0 && b.length > 0 && travel.length > 0 && special.length > 0 && telephone.length > 0 && overtime.length > 0 && loan.length > 0) {
+                var expense = parseFloat(fa) - parseFloat(ra) - parseFloat(de) - parseFloat(ad) + parseFloat(b) + parseFloat(housing) +
+                    parseFloat(travel) + parseFloat(special) + parseFloat(telephone) + parseFloat(overtime) - parseFloat(loan);
+                $("#NetSalary").val(expense.toFixed(2));
+            }
+
+        }
+    </script>
+}

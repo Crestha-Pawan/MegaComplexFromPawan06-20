@@ -1,0 +1,147 @@
+﻿
+@model Payroll.Src.ViewModel.PostViewModel
+
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index"; }
+
+<style>
+    .btn-success {
+        background-color: #40A214;
+    }
+</style>
+
+<div class="col-lg-12">
+    <div class="card">
+        <div class="card-body">
+            <div style="text-align:left">
+                <button class="btn btn-success" data-toggle="modal" PostId="0" data-target="#myModal"><i class=" icon feather icon-plus-circle"></i> Create New</button>
+            </div>
+            <hr />
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table class="table table-bordered">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+                                <th>
+                                    Name
+                                </th>
+                                <th style="text-align:center">
+                                    Action Name
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Posts)
+                            {
+                <tr>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td style="text-align:center">
+                        <div class="overlay-edit">
+                            <a type="button" class=" btn-icon btn-sm btn-secondary" href="#!" ReferenceType="Crud" data-toggle="modal" PostId="@item.Id" data-target="#myModal"><i class="ti-pencil-alt"></i></a>
+                            <a type="button" class=" btn-icon btn-sm btn-danger" href="#!" data-toggle="modal" PostId="@item.Id" data-target="#myModal"><i class="ti-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" id="DeleteBody">
+
+        <!-- /.modal-content -->
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@section Scripts
+{
+    <script type="text/javascript">
+        $("#myModal").on('show.bs.modal', function (e) {
+            const PostId = $(e.relatedTarget).attr('PostId');
+            const type = $(e.relatedTarget).attr('ReferenceType');
+
+            if (PostId > 0) {
+                if (type == null) {
+                    var url = '@Url.Action("Delete","Post")' + "?id=" + PostId;
+                    $("#DeleteBody").load(url, function () {
+
+                        $("#myModal").modal('show');
+                    });
+                }
+                else {
+                    var url = '@Url.Action("Update", "Post")' + "?id=" + PostId;
+                    $("#DeleteBody").load(url, function () {
+
+                        $("#myModal").modal('show');
+                    });
+                }
+            }
+            else {
+                var url = '@Url.Action("Create", "Post")';
+                $("#DeleteBody").load(url, function () {
+
+                    $("#myModal").modal('show');
+                });
+            }
+        })
+    </script>
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(message,type) {
+            $.growl({
+                message: message
+            }, {
+                type: type,
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {from: 'top', align: 'right'},
+                delay: 2500,
+                animate: { enter: 'animated rotateIn', exit: 'animated rotateIn'},
+                offset: {x: 30,y: 30}
+            });
+        };
+        notify('@ViewBag.Message','success');
+    });
+
+    </script>
+}
+
+@if (ViewBag.Messege != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(messege,type) {
+            $.growl({
+                message: messege
+            }, {
+                type: type,
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {from: 'top', align: 'right'},
+                delay: 2500,
+                animate: { enter: 'animated rotateIn', exit: 'animated rotateIn'},
+                offset: {x: 30,y: 30}
+            });
+        };
+        notify('@ViewBag.Messege','danger');
+    });
+
+    </script>
+}

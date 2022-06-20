@@ -1,0 +1,153 @@
+﻿@model FiboBilling.Src.ViewModel.BillingViewModel
+@{
+    decimal Total = 0;
+    decimal electricityAmount=0;
+    decimal totalCr=0;
+    decimal totalDr=0;
+}
+@using FiboInfraStructure;
+
+@inject FiboBlock.InfraStructure.Repository.IClientRepository _clientrepo;
+@inject FiboBlock.InfraStructure.Repository.IBlockRepository _blockrepo;
+@inject FiboBlock.InfraStructure.Repository.IRoomRepository _Roomrepo;
+@inject FiboBilling.InfraStructure.Repository.IBillingRepository _billsrepo;
+<script type="text/javascript">
+    function CallPrint(strid) {
+        var mywindow = document.getElementById('profile');
+        var popupWin = window.open('', "Kaamana Format", 'width=350,height=150,location=no,left=200px');
+
+        popupWin.document.open();
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css"  href="../Content/bootstrap.min.css" /></head><body onload="window.print()">')
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css" href="../Content/print.css" /></head><body onload="window.print()">')
+        popupWin.document.write(mywindow.innerHTML);
+        popupWin.document.write('</html>');
+
+        popupWin.document.close();
+
+    }
+
+</script>
+<div class="row" style="text-align:right">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <button type="button" class="btn"
+                style="margin-bottom:20px;background-color:darkblue;padding-top: 3px;
+    padding-bottom: 5px;padding-left:5px;color:white;font-weight:bold"
+                onclick="CallPrint('strid')" data-ma-action="print">
+            <i class="mdi mdi-cloud-print"></i> Print
+        </button>
+    </div>
+</div>
+<div class="col-sm-12" id="profile">
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table style="width:100%">
+                        <tr>
+                            <td style="text-align:center">
+                                <h4>Billing Report</h4>
+                                <h3>Of Month @ViewBag.Month</h3>
+                                <h3>@ViewBag.Year</h3>
+                                <hr />
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered table-striped" BORDER="1" width="100%">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+                                <th>
+                                    Client Name
+                                </th>
+                                <th>
+                                    Block No
+                                </th>
+                                <th>
+                                    Room
+                                </th>
+                                <th>
+                                    Electricity Unit
+                                </th>
+                                <th>
+                                    Electricity Amount
+                                </th>
+                                <th>
+                                    Debit(Rs)
+                                </th>
+                                <th>
+                                    Credit(Rs)
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+
+                                @foreach (var item in Model.BillingDetailList)
+                                {
+                                    Total += item.ElectricityBillAmount.ToDecimal();
+
+                                    totalDr += item.Debit.ToDecimal();
+                                    totalCr += item.Credit.ToDecimal();
+
+                                    var billing = await _billsrepo.GetByIdAsync((long)item.BillingId);
+
+                                    var client = await _clientrepo.GetAllClientAsync();
+                                    var Clients = client.Where(x => x.Id == billing.ClientId).FirstOrDefault();
+                                    var block = await _blockrepo.GetAllBlockAsync();
+                                    var Blocks = block.Where(x => x.Id == item.BlockId).FirstOrDefault();
+                                    var room = await _Roomrepo.GetAllRoomAsync();
+                                    var Rooms = room.Where(x => x.Id == item.RoomId).FirstOrDefault();
+
+                                    <tr>
+                                        <td>
+                                            @Clients.OwnerName
+                                        </td>
+                                        <td>
+                                            @Blocks.Name
+                                        </td>
+                                        <td>
+                                            @Rooms.Name
+                                        </td>
+                                        <td>
+                                            @item.ElectricityUnit
+                                        </td>
+                                        <td>
+                                            @item.ElectricityBillAmount
+                                        </td>
+                                        <td>
+                                            @item.Debit
+                                        </td>
+                                        <td>
+                                            @item.Credit
+                                        </td>
+                                    </tr>
+                                }
+
+                            <tr>
+                                <td colspan="4" style="text-align:right">
+                                    <p style="font-size:15px">
+                                        Total
+                                    </p>
+                                </td>
+                                <td>
+                                    <p style="font-size:15px">
+                                        @Total
+                                    </p>
+                                </td>
+                                <td>
+                                    <p style="font-size:15px">
+                                        @totalDr
+                                    </p>
+                                </td>
+                                <td>
+                                    <p style="font-size:15px">
+                                        @totalCr
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

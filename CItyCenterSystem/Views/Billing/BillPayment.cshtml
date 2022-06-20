@@ -1,0 +1,313 @@
+﻿@model FiboBilling.Src.Dto.BillingDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using FiboInfraStructure;
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            @*<div class="col-lg-6">
+                <label for="BlockNo">Block No.<span style="color:red">*</span></label><br />
+                <select asp-for="BlockId" asp-items="Model.BlockList" class=" form-control BlockId" required></select>
+                <div class="invalid-feedback">
+                    Please Enter A Block.
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <label for="RoomNo">Room No<span style="color:red">*</span></label><br />
+                <select asp-for="RoomId" asp-items="Model.RoomList" class=" form-control RoomId" required></select>
+                <div class="invalid-feedback">
+                    Please Enter A Room.
+                </div>
+            </div>*@
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <label for="ClientName">Client Name<br /><span style="color:red" id="message"></span></label><br />
+                <select asp-for="ClientId" asp-items="Model.ClientList" class="select2 custom-select form-control ClientId" required></select>
+                <div class="invalid-feedback">
+                    Please Enter A Client Name.
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <label for="DueAmount">Due Amount<br /><span style="color:red" id="message"></span></label><br />
+                <input type="text" asp-for="DueAmount" class="form-control" id="DueAmount" required autocomplete="off" />
+                <div class="invalid-feedback">
+                    Please Enter A Due Amount.
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <label for="DueDate">Due Date<br /><span style="color:red" id="message"></span></label><br />
+                <input type="text" asp-for="DueDate" class="form-control nepali-datepicker" id="DueDate" required autocomplete="off" readonly />
+                <div class="invalid-feedback">
+                    Please Enter A Due Date.
+                </div>
+            </div>
+            <div class="col-lg-6" style="font-size: 16px;">
+                Dr:<label id="lblDr" style="color:red"></label><br />
+                Cr:<label id="lblCr" style="color:green"></label>
+            </div>
+        </div>
+        <hr />
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row" id="Format">
+            <div class="col-md-12">
+                <div class="panel">
+                    <h4>Bill Payment</h4>
+                    <hr />
+                    <div class="panel-body report-content">
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        $(".ClientId").change(function () {
+            var clientId = $(this).val();
+            var blockId = $('#BlockId').val();
+            var roomId = $('#RoomId').val();
+            $.ajax({
+                method: 'get',
+                url: '@Url.Action("LoadBilling")?id=' + clientId + '&blockId=' + blockId + '&roomId=' + roomId + '&dueDate=' + dueDate + '&dueAmount=' + dueAmount,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                    error: function () {
+
+                    },
+                    success: function (datathis) {
+                        if (datathis != "") {
+                            $('#DueAmount').val(datathis[0]);
+                            $('#DueDate').val(datathis[1]);
+                        }
+                        else {
+                            $('#DueAmount').val(0);
+                            $('#DueDate').val("");
+                        }
+                    }
+            }).done(function () {
+                
+            });
+
+            var dueAmount = $('#DueAmount').val();
+            var dueDate = $('#DueDate').val();
+            $.ajax({
+                    method: 'get',
+                url: '@Url.Action("GetBillingDetail")?id=' + clientId + '&blockId=' + blockId + '&roomId=' + roomId + '&dueDate=' + dueDate + '&dueAmount=' + dueAmount,
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $('.report-content').html(data.message);
+
+                    },
+                    error: function (data) {
+
+                }
+            }).done(function () {
+                $("#Discount").val(0);
+                calculateTotalAmount();
+                DebitAmount();
+                CreditAmount();
+                //$("#Fine").val(0);
+            });
+
+        });
+        $(document).ready(function () {
+            $(function () {
+                $(".ClientId").change();
+
+            });
+
+        });
+        $(".BlockId").change(function () {
+            var blockId = $(this).val();
+            var clientId = $('#ClientId').val();
+            var roomId = $('#RoomId').val();
+            $.ajax({
+                method: 'get',
+                url: '@Url.Action("LoadBilling")?id=' + clientId + '&blockId=' + blockId + '&roomId=' + roomId + '&dueDate=' + dueDate + '&dueAmount=' + dueAmount,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                    error: function () {
+
+                    },
+                    success: function (datathis) {
+
+                        if (datathis != "") {
+                            $('#DueAmount').val(datathis[0]);
+                            $('#DueDate').val(datathis[1]);
+                        }
+                        else {
+                            $('#DueAmount').val(0);
+                            $('#DueDate').val("");
+                        }
+                    }
+            }).done(function () {
+                    
+            });
+            var dueAmount = $('#DueAmount').val();
+            var dueDate = $('#DueDate').val();
+            $.ajax({
+                    method: 'get',
+                url: '@Url.Action("GetBillingDetail")?id=' + clientId + '&blockId=' + blockId + '&roomId=' + roomId + '&dueDate=' + dueDate + '&dueAmount=' + dueAmount,
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $('.report-content').html(data.message);
+
+                    },
+                    error: function (data) {
+
+                }
+            }).done(function () {
+                $("#Discount").val(0);
+                calculateTotalAmount();
+                DebitAmount();
+                CreditAmount();
+                //$("#Fine").val(0);
+            });
+
+        });
+        $(document).ready(function () {
+            $(function () {
+                $(".BlockId").change();
+
+            });
+
+        });
+        $(".RoomId").change(function () {
+            var roomId = $(this).val();
+            var clientId = $('#ClientId').val();
+            var blockId = $('#BlockId').val();
+            $.ajax({
+                method: 'get',
+                url: '@Url.Action("LoadBilling")?id=' + clientId + '&blockId=' + blockId + '&roomId=' + roomId + '&dueDate=' + dueDate + '&dueAmount=' + dueAmount,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                    error: function () {
+
+                    },
+                    success: function (datathis) {
+
+                        if (datathis != "") {
+                            $('#DueAmount').val(datathis[0]);
+                            $('#DueDate').val(datathis[1]);
+
+                        }
+                        else {
+                            $('#DueAmount').val(0);
+                            $('#DueDate').val("");
+                        }
+                    }
+            }).done(function () {
+                    
+            });
+            var dueAmount = $('#DueAmount').val();
+            var dueDate = $('#DueDate').val();
+            $.ajax({
+                    method: 'get',
+                url: '@Url.Action("GetBillingDetail")?id=' + clientId + '&blockId=' + blockId + '&roomId=' + roomId + '&dueDate=' + dueDate + '&dueAmount=' + dueAmount,
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $('.report-content').html(data.message);
+
+                    },
+                    error: function (data) {
+
+                }
+            }).done(function () {
+                $("#Discount").val(0);
+                calculateTotalAmount();
+                DebitAmount();
+                CreditAmount();
+                //$("#Fine").val(0);
+            });
+
+        });
+        $(document).ready(function () {
+            $(function () {
+                $(".RoomId").change();
+
+            });
+
+        });
+        function setFineValue() {
+             $.ajax({
+             method: 'get',
+             url: '@Url.Action("LoadFine")?dueDate=' + $('#DueDate').val(),
+             contentType: "application/json; charset=utf-8",
+             dataType: "json",
+             error: function () {
+
+             },
+             success: function (datathis) {
+                 var _finePercent = datathis;
+                 var totalAmount = 0;
+                 $('.Total').each(function () {
+                     var amount = $(this).val();
+                     var amt = parseFloat(amount);
+                     totalAmount += amt;
+                 });
+                 if (totalAmount > 0) {
+                     var _fine = _finePercent / 100 * totalAmount;
+                     if (_fine > 0) {
+                         $("#Fine").val(_fine);
+                     }
+                     else {
+                         $("#Fine").val(0);
+                     }
+                 }
+             }
+             }).done(function () {
+                 CalculateNetPayable();
+             });
+        }
+        function calculateTotalAmount() {
+            var totalAmount = 0;
+            $('.Total').each(function () {
+                var amount = $(this).val();
+                var amt = parseFloat(amount);
+                totalAmount += amt;
+            });
+            $("#GrandTotal").val(totalAmount);
+            $("#NetPayable").val(totalAmount);
+            setFineValue();
+            
+        }
+        function DebitAmount(element, event) {
+            var totalAmount = 0;
+            $('.Debit').each(function () {
+                var amount = $(this).val();
+                var amt = parseFloat(amount);
+                totalAmount += amt;
+            });
+            $("#DebitTotal").val(totalAmount);
+        }
+        function CreditAmount(element, event) {
+            var totalAmount = 0;
+            $('.Credit').each(function () {
+                var amount = $(this).val();
+                var amt = parseFloat(amount);
+                totalAmount += amt;
+            });
+            $("#CreditTotal").val(totalAmount);
+        }
+        function CalculateNetPayable() {
+            var total = $("#GrandTotal").val();
+            var fine = $("#Fine").val();
+            var discount = $("#Discount").val();
+            if (fine >= 0 && discount >= 0) {
+                var netPayable = parseFloat(total) - parseFloat(discount) + parseFloat(fine);
+                $("#NetPayable").val(netPayable);
+            }
+        }
+    </script>
+}
+

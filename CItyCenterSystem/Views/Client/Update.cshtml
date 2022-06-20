@@ -1,0 +1,123 @@
+﻿@model FiboBlock.Src.Dto.ClientDto
+@{ }
+<form asp-action="Update" asp-controller="Client" method="post" class="needs-validation" novalidate>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CreatedDate" />
+    <input type="hidden" asp-for="CreatedBy" />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Client Create</h4>
+                    <hr />
+                </div>
+                <div class="card-body">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="Date">Date<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="Date" class="form-control nepali-datepicker" id="Date" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Date.
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            
+                            <div class="col-lg-6">
+                                <label for="OwnerName">OwnerName<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="OwnerName" class=" form-control" id="OwnerName" required />
+                                <div class="invalid-feedback">
+                                    Please Enter A OwnerName.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="ContactNumber">ContactNumber<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="ContactNumber" class="form-control" id="ContactNumber" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Phone Number.
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="Address">Address<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="Address" class="form-control" id="Address" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Address.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="BusinessName"> Business Name<span style="color:red">*</span></label>
+                                <input type="text" asp-for="BusinessName" class="form-control" id="BusinessNameId" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter a BusinessName.
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="PanNo"> Pan No<span style="color:red">*</span></label>
+                                <input type="text" asp-for="PanNo" class="form-control" id="PanNo" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter a Pan Number.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="CitizenShipNo"> CitizenShip No<span style="color:red">*</span></label>
+                                <input type="text" asp-for="CitizenShipNo" class="form-control" id="CitizenShipNo" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter a CitizenShip Number .
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="Collateral">Collateral(Rs.)<span style="color:red">*</span></label>
+                                <input type="text" asp-for="Collateral" class="form-control" id="Collateral" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter a Collateral.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="CitizenShipNo">Rent Due<span style="color:red">*</span></label>
+                                <input type="text" asp-for="RentDue" class="form-control" id="RentDue" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter a Rent Due .
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="Collateral">Electricity Due<span style="color:red">*</span></label>
+                                <input type="text" asp-for="ElectricityDue" class="form-control" id="ElectricityDue" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter a Electricity Due.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="form-group">
+                        <div class="col-md-12" style="text-align:right">
+                            <button type="submit" class="btn  btn-success" id="btnSubmit"><i class="ti-check"></i>Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

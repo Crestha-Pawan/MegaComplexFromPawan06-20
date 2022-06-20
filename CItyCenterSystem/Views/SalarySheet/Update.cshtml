@@ -1,0 +1,97 @@
+﻿@model Payroll.Src.Dto.SalarySheetDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Update";
+}
+
+<form asp-action="Update" asp-controller="SalarySheet" method="post" class="needs-validation" novalidate>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="CreatedDate" />
+    <input type="hidden" asp-for="CreatedBy" />
+    <input type="hidden" asp-for="Id" />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">SalarySheet Create</h4>
+                    <hr />
+                </div>
+                <div class="card-body">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="EmployeeId">Employee Name<span style="color:red">*</span></label><br />
+                                <select asp-for="EmployeeId" asp-items="Model.EmployeeList" class="form-control" id="EmployeeId" required></select>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="PostId">Post<span style="color:red">*</span></label><br />
+                                <select asp-for="PostId" asp-items="Model.PostList" class="form-control" id="PostId" required></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="Salary">Salary<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="BasicSalary" class="form-control" id="Salary" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Salary.
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="Tax">Deduction<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="Deduction" class="form-control" id="tax" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Tax.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="Bonus">Bonus<span style="color:red">*</span></label><br />
+                                <input type="text" asp-for="Bonus" class="form-control" id="bonus" required autocomplete="off" />
+                                <div class="invalid-feedback">
+                                    Please Enter A Bonus.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="form-group">
+                <div class="col-md-12" style="text-align:right">
+                    <button type="submit" class="btn  btn-success" id="btnSubmit"><i class="feather mr-2 icon-check-square"></i>Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#EmployeeId").on("change", function () {
+                var empId = $('#EmployeeId').val();
+                $.ajax({
+                    data: { empId: empId },
+                    type: "GET",
+                    dataType: "json",
+                    url: '@Url.Action("LoadSalary", "JsonRequest")',
+                    async: false,
+                    error: function () {
+                                            },
+                    success: function (datathis) {
+                        //alert(datathis.postId);
+                        $('#PostId').val(datathis.postId);
+                        $('#Salary').val(datathis.salary);
+                            }
+                });
+            });
+        });
+    </script>
+}
+
+

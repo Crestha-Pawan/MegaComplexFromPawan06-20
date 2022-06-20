@@ -1,0 +1,165 @@
+﻿@model FiboBilling.Src.Dto.ExpenseDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Create";
+}
+
+<form asp-action="Update" asp-controller="Expense" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CreatedBy" />
+    <input type="hidden" asp-for="CreatedDate" />
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Expense</h4>
+                    <hr />
+                </div>
+                <div class="card-body">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="Date">Billing Date<span style="color:red">*</span></label><br />
+                                <input type="text" class="form-control nepali-datepicker" asp-for="Miti" required autocomplete="off" />
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="Date">Expense Name<span style="color:red">*</span></label><br />
+                                <input type="text" class="form-control" asp-for="Name" required autocomplete="off" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="col-lg-12">
+                        <table class="table table-bordered table-striped" id="table">
+                            <thead>
+                                <tr>
+                                    <th colspan="6">
+                                        <button type="button" class="btn btn-success btnAdd"><i class="feather icon-file-plus"></i> New Row</button>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        S.N.
+                                    </td>
+                                    <td>
+                                        Particulars
+                                    </td>
+                                    <td>
+                                        Rate
+                                    </td>
+                                    <td>
+                                        Quantity
+                                    </td>
+                                    <td>
+                                        Amount
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                            <tr>
+                                <td colspan="4" style="text-align:right">
+                                    <label class="control-label">Total</label>
+                                </td>
+                                <td>
+                                    <input type="text" asp-for="Amount" class="form-control" readonly />
+                                </td>
+                                <td colspan="1"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var row =
+                '<tr class="billing_row" >' +
+                '<td>1</td>' +
+                '<td><input type="text" class="form-control" name="ExpenseDetailDtos[' + 0 + '].Name" /></td>' +
+                '<td><input type="text" class="form-control Rate" name="ExpenseDetailDtos[' + 0 + '].Rate" onkeyup="toAmount(this,event)" /></td>' +
+                '<td><input type="text" class="form-control Quantity" name="ExpenseDetailDtos[' + 0 + '].Quantity" onkeyup="toAmount(this,event)" /></td>' +
+                '<td><input type="text" class="form-control Amount" name="ExpenseDetailDtos[' + 0 + '].Amount" readonly /></td>' +
+                '<td><a href="#!" class="BtnMinus  btn-icon btn-sm btnClear overlay-edit" value="x"  disabled ><i class=" icon feather icon-trash-2 ml-3 f-16 text-c-red"></i></a></td>' +
+                '</tr>'
+
+            $("#table").append(row);
+
+            function addRow() {
+                var count = $(".billing_row").length;
+                var length = $(".billing_row").length + 1;
+                var row =
+                    '<tr class="billing_row" >' +
+                    '<td>' + length + '</td>' +
+                    '<td><input type="text" class="form-control" name="ExpenseDetailDtos[' + count + '].Name" /></td>' +
+                    '<td><input type="text" class="form-control Rate" name="ExpenseDetailDtos[' + count + '].Rate" onkeyup="toAmount(this,event)" /></td>' +
+                    '<td><input type="text" class="form-control Quantity" name="ExpenseDetailDtos[' + count + '].Quantity" onkeyup="toAmount(this,event)" /></td>' +
+                    '<td><input type="text" class="form-control Amount" name="ExpenseDetailDtos[' + count + '].Amount" readonly /></td>' +
+                    '<td><a href="#!" class="BtnMinus  btn-icon btn-sm btnClear overlay-edit" value="x"   ><i class=" icon feather icon-trash-2 ml-3 f-16 text-c-red"></i></a></td>' +
+                    '</tr>'
+
+                $("#table").append(row);
+            }
+
+            $("#table").on('click', '.btnAdd', addRow);
+            function deleteRow() {
+                var par = $(this).parent().parent();
+                par.remove();
+            };
+
+            $("#table").on("click", ".BtnMinus", deleteRow);
+        })
+
+        function toAmount(element, event) {
+            var row = $(element).closest("tr");
+            var unitPrice = row.find(".Rate").val();
+            var quantity = row.find(".Quantity").val();
+            var amount = unitPrice * quantity;
+            row.find(".Amount").val(amount);
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            var totalAmount = 0;
+            $('.Amount').each(function () {
+                var amount = $(this).val();
+                var amt = parseFloat(amount);
+                totalAmount += amt;
+            });
+            $("#Amount").val(totalAmount);
+        }
+
+    </script>
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(message) {
+            $.notify({
+                message: message,
+                type: 'danger',
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-danger',
+                placement: { from: 'bottom', align: 'right' },
+                delay: 2500,
+                animate: { enter: 'animated fadeInRight', exit: 'animated fadeOutRight' },
+                offset: { x: 30, y: 30 }
+            });
+        };
+        /**/
+        notify('@ViewBag.Message');
+    /**/
+    });
+    </script>
+}

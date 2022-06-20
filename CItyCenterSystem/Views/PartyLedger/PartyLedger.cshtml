@@ -1,0 +1,191 @@
+﻿@model FiboParty.Src.ViewModel.PartiesReportVM
+@{
+    int count = 1;
+    decimal? balance = 0;
+    decimal? totalDr = 0;
+    decimal? totalCr = 0;
+    decimal? pmBalance = 0;
+    decimal? pmTotalDr = 0;
+    decimal? pmTotalCr = 0;
+    decimal? totalBalance = 0;
+    decimal? pmTotalBalance = 0;
+    var monthList = await _monthRepo.GetAllMonthAsync();
+    var month = monthList.Where(x => x.MonthOrder == ViewBag.MonthOrder).FirstOrDefault();
+    var partyList = await _partyRepo.GetAllPartyAsync();
+    var party = partyList.Where(x => x.Id == Model.PartyId).FirstOrDefault();
+}
+@using FiboInfraStructure;
+@inject FiboOffice.InfraStructure.Repository.IMonthRepository _monthRepo;
+@inject FiboParty.Infrastructure.Repository.IPartyRepository _partyRepo;
+<script type="text/javascript">
+    function CallPrint(strid) {
+        var mywindow = document.getElementById('profile');
+        var popupWin = window.open('', "Kaamana Format", 'width=350,height=150,location=no,left=200px');
+
+        popupWin.document.open();
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css"  href="../Content/bootstrap.min.css" /></head><body onload="window.print()">')
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css" href="../Content/print.css" /></head><body onload="window.print()">')
+        popupWin.document.write(mywindow.innerHTML);
+        popupWin.document.write('</html>');
+
+        popupWin.document.close();
+
+    }
+
+</script>
+
+<div class="col-sm-12" >
+    <div class="card">
+        <div class="col-lg-12" style="text-align:right">
+            <button type="button" class="btn " style="margin-top: 20px; background-color: darkblue; color: white; font-weight: bold" onclick="CallPrint('strid')" data-ma-action="print">
+                <i class="mdi mdi-cloud-print"></i> Print
+            </button>
+
+        </div>
+        <hr />
+        <div class="card-body" id="profile">
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table style="width:100%">
+                        <tr>
+                            <td style="text-align:center">
+                                <h4>General Ledger of @party.Name</h4>
+                                <h4>For the month @month.MonthName</h4>
+                                <hr />
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered table-striped" BORDER="1" width="100%">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+                                <th>
+                                    Date
+                                </th>
+                                <th>
+                                    Invoice No.
+                                </th>
+                                <th>
+                                    Debit(Rs.)
+                                </th>
+                                <th>
+                                    Credit(Rs.)
+                                </th>
+                                <th>
+                                    Balance
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.PMLedgerDetailList)
+                            {
+                                pmTotalDr += item.DebitAmount.ToDecimal();
+                                pmTotalCr += item.CreditAmount.ToDecimal();
+                            }
+                            <tr>
+                                <td>
+                                    @ViewBag.MonthStartDate
+                                </td>
+                                <td style="color:red">
+                                    Balance B/D
+                                </td>
+                                <td style="color:red">
+                                    @*@if (pmTotalDr > 0)
+                        {
+                            @pmTotalDr
+                        }*@
+                                    <span>-</span>
+                                </td>
+                                <td style="color:red">
+                                    @*@if (pmTotalCr > 0)
+                        {
+                            @pmTotalCr
+                        }*@
+                                    <span>-</span>
+                                </td>
+                                <td style="color:red">
+                                    @{
+                                        pmTotalBalance = pmTotalDr - pmTotalCr;
+                                    }
+                                    @if (pmTotalBalance.ToString().Contains('-'))
+                                    {
+                                        <span>(@pmTotalBalance.ToString().Trim('-'))</span>
+                                    }
+                                    else
+                                    {
+                                        @pmTotalBalance
+                                    }
+
+                                </td>
+                            </tr>
+                            @foreach (var item in Model.LedgerDetailList)
+                            {
+                                if (count == 1)
+                                {
+                                    balance = pmTotalBalance.ToDecimal() + balance.ToDecimal() + item.DebitAmount.ToDecimal() - item.CreditAmount.ToDecimal();
+                                }
+                                else
+                                {
+                                    balance = balance.ToDecimal() + item.DebitAmount.ToDecimal() - item.CreditAmount.ToDecimal();
+                                }
+                                if (count == Model.LedgerDetailList.Count())
+                                {
+                                    totalBalance = balance;
+                                }
+                                <tr>
+                                    <td>
+                                        @item.Date.ToDateTime().ToNepDate()
+
+                                    </td>
+                                    <td>
+                                        @item.BillNo
+                                    </td>
+                                    <td>
+                                        @item.DebitAmount
+                                    </td>
+                                    <td>
+                                        @item.CreditAmount
+                                    </td>
+                                    <td>
+                                        @balance.ToString().Trim('-')
+                                    </td>
+                                </tr>
+                                count++;
+                            }
+                            <tr>
+                                <td colspan="2" style="text-align:right">Balance C/D</td>
+                                <td>
+                                    @*@foreach (var item in Model.LedgerDetailList)
+                        {
+                            if (item.DebitAmount.ToDecimal() > 0)
+                                totalDr += item.DebitAmount.ToDecimal();
+                        }
+                        @totalDr*@
+                                    <span>-</span>
+                                </td>
+                                <td>
+                                    @*@foreach (var item in Model.LedgerDetailList)
+                        {
+                            if (item.CreditAmount.ToDecimal() > 0)
+                                totalCr += item.CreditAmount.ToDecimal();
+                        }
+                        @totalCr*@
+                                    <span>-</span>
+                                </td>
+                                <td>
+                                    @if (totalBalance.ToString().Contains('-'))
+                                    {
+                                        <span>(@totalBalance.ToString().Trim('-'))</span>
+                                    }
+                                    else
+                                    {
+                                        @totalBalance
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,179 @@
+﻿@model FiboBlock.Src.ViewModel.ElectricityUnitSetupViewModel
+@{
+
+    int SN = 0;
+    decimal total = 0;
+}
+@inject FiboBlock.InfraStructure.Repository.IClientRepository _clientrepo;
+@inject FiboBlock.InfraStructure.Repository.IBlockRepository _blockrepo;
+@inject FiboBlock.InfraStructure.Repository.IRoomRepository _roomrepo;
+@inject FiboBlock.InfraStructure.Repository.IElectricityUnitSetupRepository _electricityunitrepo;
+@using FiboInfraStructure;
+
+<script type="text/javascript">
+    function CallPrint(strid) {
+        var mywindow = document.getElementById('profile');
+        var popupWin = window.open('', "Kaamana Format", 'width=350,height=150,location=no,left=200px');
+
+        popupWin.document.open();
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css"  href="../Content/bootstrap.min.css" /></head><body onload="window.print()">')
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css" href="../Content/print.css" /></head><body onload="window.print()">')
+        popupWin.document.write(mywindow.innerHTML);
+        popupWin.document.write('</html>');
+
+        popupWin.document.close();
+
+    }
+
+</script>
+
+@using (Html.BeginForm("ElectricityReport", "ElectricityUnitSetup", FormMethod.Post, new { @class = "form-view-data" }))
+{
+    <input type="hidden" asp-for="YearId">
+    <input type="hidden" asp-for="MonthId">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <label for="ClientName">Client Name<br /><span style="color:red" id="message"></span></label><br />
+                        <select asp-for="ClientId" asp-items="Model.ClientSelectList" class="select2 custom-select form-control ClientId" required>
+                            <option value="0">--Select--</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please Enter A Client Name.
+                        </div>
+                    </div>
+                    <div class="btn btn-group">
+                        <button type="submit" class="btn btn-success">Search</button>
+                        <button type="button" class="btn btn-success"
+                                style="background-color:darkblue;color:white;font-weight:bold"
+                                onclick="CallPrint('strid')" data-ma-action="print">
+                            <i class="mdi mdi-cloud-print"></i> Print
+                        </button>
+                        <button type="button" class="btn btn-secondary" style="float: right"
+                                onclick="window.location.href = '@Url.Action("ExportToExcel","ElectricityUnitSetup",new { monthId=Model.MonthId,yearId=Model.YearId})'">
+                            Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+<div class="col-sm-12" id="profile">
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table style="width:100%">
+                        <tr>
+                            <td style="text-align:center">
+                                <h4>Electricity Report</h4>
+                                <hr />
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered table-striped">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+                                <th>
+                                    Client Name
+                                </th>
+                                <th>
+                                    Block
+                                </th>
+                                <th>
+                                    Room
+                                </th>
+                                <th>
+                                    Previous Unit
+                                </th>
+                                <th>
+                                    Current Unit
+                                </th>
+                                <th>
+                                    Consumed Unit
+                                </th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ElectricitiesList)
+                            {
+                                total += item.Amount.ToDecimal();
+                                var electricunitset = await _electricityunitrepo.GetByIdAsync((long)item.Id);
+
+                                var block = await _blockrepo.GetAllBlockAsync();
+                                var blocks = block.Where(x => x.Id == electricunitset.BlockId).FirstOrDefault();
+
+                                var client = await _clientrepo.GetAllClientAsync();
+                                var clients = client.Where(x => x.Id == electricunitset.ClientId).FirstOrDefault();
+
+                                var room = await _roomrepo.GetAllRoomAsync();
+                                var rooms = room.Where(x => x.Id == electricunitset.RoomId).FirstOrDefault();
+
+                                //SN++;
+                                //totalIncome += item.TotalIncome.ToDecimal();
+                                //incomeAauda += item.BusIncomeAauda.ToDecimal();
+                                //incomeJada += item.BusIncomeJada.ToDecimal();
+                                <tr>
+                                    <td>
+                                        @clients.OwnerName
+                                    </td>
+                                    <td>
+                                        @blocks.Name
+
+                                    </td>
+                                    <td>
+                                        @rooms.Name
+                                    </td>
+                                    <td>
+                                        @electricunitset.PreviousUnit
+                                    </td>
+                                    <td>
+                                        @electricunitset.CurrentUnit
+                                    </td>
+                                    <td>
+                                        @electricunitset.Unit
+                                    </td>
+                                    <td>
+                                        @electricunitset.Rate
+                                    </td>
+
+                                    <td>
+                                        @electricunitset.Amount
+                                    </td>
+
+                                </tr>
+                            }
+                            <tr>
+                                <td colspan="7" style="text-align:right">
+                                    <p style="font-size:15px">
+                                        Total
+                                    </p>
+                                </td>
+                                @*x<td>
+                                        <p style="font-size:15px">
+                                            @total
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <p style="font-size:15px">
+                                            @total
+                                        </p>
+                                    </td>*@
+                                <td>
+                                    <p style="font-size:15px">
+                                        @total
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

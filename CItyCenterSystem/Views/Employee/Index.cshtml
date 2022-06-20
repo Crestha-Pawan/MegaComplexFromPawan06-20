@@ -1,0 +1,186 @@
+﻿@model Payroll.Src.ViewModel.EmployeeViewModel
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index"; }
+@inject FiboAddress.InfraStructure.Repository.IProvienceRepository _provienceRepo;
+@inject FiboAddress.InfraStructure.Repository.IDistrictRepository _districtRepo;
+@inject FiboAddress.InfraStructure.Repository.ILocalLevelRepository _localLevelRepo;
+@inject Payroll.InfraStructure.Repository.IPostRepository _postRepository;
+
+
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <div style="text-align:left">
+                <a class="btn btn-success" type="button" asp-action="Create" asp-controller="Employee"><i class="feather icon-plus-circle"></i> Create New</a>
+            </div>
+            <hr />
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table class="table table-bordered">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+
+                                <th>
+                                    Name
+                                </th>
+                                <th>Phone No.</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th style="width:120px">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Employees)
+                            {
+
+                                <tr>
+
+                                    <td>
+                                        @item.Name
+                                    </td>
+
+                                    <td>@item.PhoneNumber</td>
+                                    <td>@item.Email</td>
+                                    <td>
+                                        @if (item.IsActive())
+                                        {
+                                            <span class="badge badge-light-success">@item.Status</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-light-danger">@item.Status</span>
+                                        }
+                                    </td>
+
+                                    <td style="text-align:center">
+
+                                        <div class="overlay-edit">
+                                            <a type="button" class="btn-sm btn-icon btn-secondary" asp-action="Update" asp-controller="Employee" asp-route-id="@item.Id">
+                                                <i class="ti-pencil-alt"></i>
+                                            </a>
+                                            <a type="button" class="btn-sm btn-icon btn-danger" href="#!" data-toggle="modal" EmpId="@item.Id" data-target="#myModal"><i class="ti-trash"></i></a>
+                                            @if (item.IsActive())
+                                            {
+
+
+                                                <a type="button" class="btn-sm btn-icon btn-warning" href="#!" data-toggle="modal" EmpId="@item.Id" data-target="#myToggleModal"><i class="ti-thumb-down"></i></a>
+                                            }
+                                            else
+                                            {
+                                                <a type="button" class="btn-sm btn-icon btn-success" href="#!" data-toggle="modal" EmpId="@item.Id" data-target="#myToggleModal"><i class="ti-thumb-up"></i></a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" id="DeleteBody">
+
+        <!-- /.modal-content -->
+    </div>
+</div>
+<div class="modal" id="myToggleModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" id="ToggleBody">
+
+        <!-- /.modal-content -->
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@section Scripts
+    {
+    <script type="text/javascript">
+            $("#myModal").on('show.bs.modal', function (ke
+            ) {
+                const empId = $(ke.relatedTarget).attr('EmpId');
+
+                var url = '@Url.Action("Delete","Employee")' + "?id=" + empId;
+                if (empId > 0) {
+                $("#DeleteBody").load(url, function () {
+
+                    $("#myModal").modal('show');
+                });
+            }
+            else {
+                $("#myModal").modal('hide');
+            }
+            })
+        $("#myToggleModal").on('show.bs.modal', function (ke
+            ) {
+                const empId = $(ke.relatedTarget).attr('EmpId');
+
+                var url = '@Url.Action("ToggleStatus", "Employee")' + "?id=" + empId;
+                if (empId > 0) {
+                    $("#ToggleBody").load(url, function () {
+
+                        $("#myToggleModal").modal('show');
+                });
+            }
+            else {
+                    $("#myToggleModal").modal('hide');
+            }
+        })
+    </script>
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(message,type) {
+            $.growl({
+                message: message
+            }, {
+                type: type,
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {from: 'top', align: 'right'},
+                delay: 2500,
+                animate: { enter: 'animated rotateIn', exit: 'animated rotateIn'},
+                offset: {x: 30,y: 30}
+            });
+        };
+        notify('@ViewBag.Message','success');
+    });
+
+    </script>
+}
+
+@if (ViewBag.Messege != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(messege,type) {
+            $.growl({
+                message: messege
+            }, {
+                type: type,
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {from: 'top', align: 'right'},
+                delay: 2500,
+                animate: { enter: 'animated rotateIn', exit: 'animated rotateIn'},
+                offset: {x: 30,y: 30}
+            });
+        };
+        notify('@ViewBag.Messege','danger');
+    });
+
+    </script>
+}

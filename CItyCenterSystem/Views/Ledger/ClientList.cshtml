@@ -1,0 +1,136 @@
+﻿@model FiboBlock.Src.ViewModel.ClientViewModel
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index"; }
+
+<script type="text/javascript">
+    function CallPrint(strid) {
+        var mywindow = document.getElementById('profile');
+        var popupWin = window.open('', "Kaamana Format", 'width=350,height=150,location=no,left=200px');
+
+        popupWin.document.open();
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css"  href="../Content/bootstrap.min.css" /></head><body onload="window.print()">')
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css" href="../Content/print.css" /></head><body onload="window.print()">')
+        popupWin.document.write(mywindow.innerHTML);
+        popupWin.document.write('</html>');
+
+        popupWin.document.close();
+
+    }
+
+</script>
+@using (Html.BeginForm("ClientList", "Ledger", FormMethod.Get, new { @class = "form-view-data" }))
+{
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6">
+                    <label for="ClientName">Client Name<br /><span style="color:red" id="message"></span></label><br />
+                    <select asp-for="ClientId" asp-items="Model.ClientSelectList" class="select2 custom-select form-control ClientId" required></select>
+                    <div class="invalid-feedback">
+                        Please Enter A Client Name.
+                    </div>
+                </div>
+                <div class="btn btn-group">
+                    <button type="submit" class="btn btn-success">Search</button>
+                    <button type="button" class="btn btn-success"
+                            style="background-color:darkblue;color:white;font-weight:bold"
+                            onclick="CallPrint('strid')" data-ma-action="print">
+                        <i class="mdi mdi-cloud-print"></i> Print
+                    </button>
+                    <button type="button" class="btn btn-secondary" style="float: right"
+                            onclick="window.location.href = '@Url.Action("ExportToExcel","Ledger")'">
+                        Export Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>}
+<div class="col-sm-12" id="profile">
+    <div class="card">
+        <div class="card-body">
+            <h4>Client Ledger</h4>
+            <hr />
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table class="table table-bordered table-striped" BORDER="1" width="100%">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+                                <th>
+                                    Date
+                                </th>
+                                <th>
+                                    Owner Name
+                                </th>
+                                <th>
+                                    Address
+                                </th>
+                                <th>
+                                    Business Name
+                                </th>
+                                <th>
+                                    Pan No
+                                </th>
+                                <th>
+                                    Contact Number
+                                </th>
+                                <th>
+                                    CitizenShip No
+                                </th>
+                                <th>
+                                    Collateral(Rs.)
+                                </th>
+                                <th>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Clients)
+                            {
+                <tr>
+                    <td>
+                        @item.Date
+                    </td>
+                    <td>
+                        @item.OwnerName
+                    </td>
+                    <td>
+                        @item.Address
+                    </td>
+                    <td>
+                        @item.BusinessName
+                    </td>
+                    <td>
+                        @item.PanNo
+                    </td>
+                    <td>
+                        @item.ContactNumber
+                    </td>
+                    <td>
+                        @item.CitizenShipNo
+                    </td>
+                    <td>
+                        @item.Collateral
+                    </td>
+                    <td class="btn-group btn-group-sm">
+                        <a type="button" class=" btn-icon btn-sm btn-secondary" asp-action="ClientLedger" asp-controller="Ledger" asp-route-id="@item.Id"><i class="ti-eye" data-toggle="tooltip" title="Ledger"></i></a>
+                    </td>
+                </tr>
+}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@section Scripts
+{
+
+}

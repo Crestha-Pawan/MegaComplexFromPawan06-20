@@ -1,0 +1,844 @@
+﻿
+
+<!DOCTYPE html>
+<html lang="en">
+@inject Microsoft.AspNetCore.Identity.UserManager<FiboInfraStructure.Data.ApplicationUser> _userManager;
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@using FiboUser.Constants
+@using FiboUser.Seeds
+@{
+    CheckRole check = new CheckRole();
+    var currentUser = await _userManager.GetUserAsync(User);
+    var userRoles = await _userManager.GetRolesAsync(currentUser);
+    var roleName = userRoles.FirstOrDefault();
+}
+
+<!-- Mirrored from html.phoenixcoded.net/mega-able/default/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 25 Aug 2021 08:18:11 GMT -->
+<head>
+    <title>Parichaya Awas Biikash Pvt. Ltd.</title>
+    <!-- HTML5 Shim and Respond.js IE10 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 10]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+      <![endif]-->
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="Gradient Able Bootstrap admin template made using Bootstrap 4 and it has huge amount of ready made feature, UI components, pages which completely fulfills any dashboard needs." />
+    <meta name="keywords" content="bootstrap, bootstrap admin template, admin theme, admin dashboard, dashboard template, admin template, responsive" />
+    <meta name="author" content="Phoenixcoded" />
+    <!-- Favicon icon -->
+    <link rel="icon" href="http://html.phoenixcoded.net/mega-able/files/assets/images/favicon.ico" type="image/x-icon">
+    <!-- Google font-->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet">
+    <!-- waves.css -->
+    <link href="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/waves/css/waves.min.css" rel="stylesheet" type="text/css" media="all" />
+    <!-- Required Fremwork -->
+    <link href="~/Community/html.phoenixcoded.net/mega-able/files/bower_components/bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <!-- waves.css -->
+    <link rel="stylesheet" href="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/waves/css/waves.min.css" type="text/css" media="all">
+    <!-- themify icon -->
+    <link rel="stylesheet" type="text/css" href="~/Community/html.phoenixcoded.net/mega-able/files/assets/icon/themify-icons/themify-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" type="text/css" href="~/Community/html.phoenixcoded.net/mega-able/files/assets/icon/font-awesome/css/font-awesome.min.css">
+    <!-- scrollbar.css -->
+    <link rel="stylesheet" type="text/css" href="~/Community/html.phoenixcoded.net/mega-able/files/assets/css/jquery.mCustomScrollbar.css">
+    <!-- am chart export.css -->
+    <link href="~/Community/www.amcharts.com/lib/3/plugins/export/export.css" rel="stylesheet" type="text/css" media="all" />
+    <!-- radial chart.css -->
+    <link rel="stylesheet" href="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/chart/radial/css/radial.css" type="text/css" media="all">
+    <!-- Style.css -->
+    <link rel="stylesheet" type="text/css" href="~/Community/html.phoenixcoded.net/mega-able/files/assets/css/style.css">
+    <link href="~/Community/html.phoenixcoded.net/mega-able/files/assets/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/bootstrap-select/bootstrap-select.min.css" rel="stylesheet" />
+    <link href="~/City/nepali.datepicker.v3.6 (1)/css/nepali.datepicker.v3.6.min.css" rel="stylesheet" />
+    <link href="~/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/notification/notification.css" rel="stylesheet" />
+    <style>
+        .invalid input:required:invalid {
+            background: #BE4C54;
+        }
+
+        .select2-results__option[aria-selected] {
+            cursor: pointer;
+            line-height: 17px !important;
+        }
+
+        [role=button], a, area, button, input:not([type=range]), label, select, summary, textarea {
+            -ms-touch-action: manipulation;
+            touch-action: manipulation;
+            color: #000000;
+        }
+
+        .invalid input:required:valid {
+            background: #17D654;
+        }
+
+        .form-control {
+            border: 1px solid black;
+            margin-top: 1px;
+            border-radius: 5px;
+        }
+
+        .center-div {
+            width: 300px;
+            height: 300px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -150px;
+            margin-top: -150px;
+        }
+
+        .spinner {
+            position: fixed;
+            z-index: 999;
+            height: 100%;
+            width: 100%;
+            top: 0;
+            left: 0;
+            background-color: Black;
+            filter: alpha(opacity=60);
+            opacity: 0.6;
+            -moz-opacity: 0.8;
+        }
+
+        .loader {
+            margin: auto;
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #15a0ec;
+            border-bottom: 16px solid #15a0ec;
+            width: 120px;
+            height: 120px;
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #444;
+            line-height: 15px !important;
+        }
+
+        .select2-container--open .select2-dropdown--below {
+            margin-left: 10px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 35px;
+            position: absolute;
+            top: 2px;
+            color: black;
+            right: -5px;
+            width: 20px;
+        }
+
+        .inner-div {
+            background-color: white;
+            border-radius: 15px;
+            margin: auto;
+            padding: 2%;
+            width: 150px;
+        }
+
+        .pcoded[theme-layout="vertical"] .pcoded-header[pcoded-header-position="fixed"] {
+            position: fixed;
+            z-index: 1028;
+            margin-top: -8px !important;
+            padding-top: 4px !important;
+        }
+
+        @@-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .select2-container--default .select2-selection--single {
+            background-color: #fff;
+            border: 1px solid black;
+            border-radius: 4px;
+            width: 100%;
+            margin-left: 10px;
+            height: 35px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Pre-loader start -->
+    <div class="theme-loader">
+        <div class="loader-track">
+            <div class="preloader-wrapper">
+                <div class="spinner-layer spinner-blue">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+                <div class="spinner-layer spinner-red">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+
+                <div class="spinner-layer spinner-yellow">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+
+                <div class="spinner-layer spinner-green">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Pre-loader end -->
+    <div id="pcoded" class="pcoded">
+        <div class="pcoded-overlay-box"></div>
+        <div class="pcoded-container navbar-wrapper">
+            <nav class="navbar header-navbar pcoded-header">
+                <div class="navbar-wrapper">
+                    <div class="navbar-logo">
+                        <h4 style="color: white;font-size:20px;text-align:left;margin-left:15%">Parichaya Awas Bikash Pvt. Ltd.</h4>
+                        <a class="mobile-menu waves-effect waves-light" id="mobile-collapse" href="#!">
+                            <i class="ti-menu"></i>
+                        </a>
+                        <div class="mobile-search waves-effect waves-light">
+                            <div class="header-search">
+                                <div class="main-search morphsearch-search">
+                                    <div class="input-group">
+                                        <span class="input-group-prepend search-close"><i class="ti-close input-group-text"></i></span>
+                                        <input type="text" class="form-control" placeholder="Enter Keyword">
+                                        <span class="input-group-append search-btn"><i class="ti-search input-group-text"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*<a href="index-2.html">
+                                <img class="img-fluid" src="~/Community/html.phoenixcoded.net/mega-able/files/assets/images/logo.png" alt="Theme-Logo" />
+                            </a>*@
+                        <a class="mobile-options waves-effect waves-light">
+                            <i class="ti-more"></i>
+                        </a>
+                    </div>
+
+                    <div class="navbar-container container-fluid">
+                        <ul class="nav-left">
+                            <li>
+                                <div class="sidebar_toggle"><a href="javascript:void(0)"><i class="ti-menu"></i></a></div>
+                            </li>
+                            <li class="header-search" style="font-size:18px;color:white">
+
+                            </li>
+                        </ul>
+                        <ul class="nav-right">
+                            <li class="user-profile header-notification">
+                                <a href="#!" class="waves-effect waves-light">
+                                    <img src="~/User.png" class="img-radius" alt="User-Profile-Image">
+                                    <span>User</span>
+                                    <i class="ti-angle-down"></i>
+                                </a>
+                                <ul class="show-notification profile-notification">
+                                    <li class="waves-effect waves-light">
+                                        <a asp-action="Register" asp-controller="Account">
+                                            <i class="ti-layout-sidebar-left"></i> New User
+                                        </a>
+                                    </li>
+                                    <li class="waves-effect waves-light">
+                                        <a asp-action="Login" asp-controller="Account">
+                                            <i class="ti-layout-sidebar-left"></i> Logout
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <!-- Sidebar chat start -->
+            <!-- Sidebar inner chat start-->
+            <!-- Sidebar inner chat end-->
+            <div class="pcoded-main-container">
+                <div class="pcoded-wrapper">
+                    <nav class="pcoded-navbar">
+                        <div class="sidebar_toggle"><a href="#"><i class="icon-close icons"></i></a></div>
+                        <div class="pcoded-inner-navbar main-menu">
+                            <div class="pcoded-navigation-label">Navigation</div>
+                            <ul class="pcoded-item pcoded-left-item">
+                                <li class="">
+                                    <a asp-action="Index" asp-controller="Home" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-view-grid"></i><b>D</b></span>
+                                        <span class="pcoded-mtext">Dashboard</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                            <div class="pcoded-navigation-label">Billing</div>
+                            <ul class="pcoded-item pcoded-left-item">
+                                <li class="pcoded-hasmenu">
+                                    <a href="javascript:void(0)" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-receipt"></i><b>W</b></span>
+                                        <span class="pcoded-mtext">Billing</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            @*@if ((AuthorizationService.AuthorizeAsync(User, Permissions.ApplicationPermission.BillingReport)).Result.Succeeded)
+                                                {*@
+                                            <a asp-action="Index" asp-controller="Billing" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Billing</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                            @*}*@
+                                        </li>
+                                    </ul>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="GenerateBill" asp-controller="Billing" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Generate Bill</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    @*<ul class="pcoded-submenu">
+                                            <li class="">
+                                                <a asp-action="BillPayment" asp-controller="Billing" class="waves-effect waves-dark">
+                                                    <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                    <span class="pcoded-mtext">Bill Payment</span>
+                                                    <span class="pcoded-mcaret"></span>
+                                                </a>
+                                            </li>
+                                        </ul>*@
+                                </li>
+
+                            </ul>
+                            <div class="pcoded-navigation-label">Expense</div>
+                            <ul class="pcoded-item pcoded-left-item">
+                                <li class="pcoded-hasmenu">
+                                    <a href="javascript:void(0)" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-receipt"></i><b>W</b></span>
+                                        <span class="pcoded-mtext">Expense</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="OfficeExpenses" asp-controller="Expense" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Administrative Expenses</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="OfficeExpView" asp-controller="Expense" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Expense History</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <div class="pcoded-navigation-label">Party Payment</div>
+                            <ul class="pcoded-item pcoded-left-item">
+                                <li class="pcoded-hasmenu">
+                                    <a href="javascript:void(0)" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-receipt"></i><b>W</b></span>
+                                        <span class="pcoded-mtext">Party Payment</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="Index" asp-controller="PartyLedger" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Ledger</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="Index" asp-controller="Party" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Party</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="PartiesReport" asp-controller="PartyLedger" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">PartyReport</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <div class="pcoded-navigation-label">Payroll</div>
+                            <ul class="pcoded-item pcoded-left-item">
+                                <li class="pcoded-hasmenu">
+                                    <a href="javascript:void(0)" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-receipt"></i><b>W</b></span>
+                                        <span class="pcoded-mtext">SalarySheet</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        <li class=" ">
+                                            <a asp-action="SalaryIndex" asp-controller="Employee" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Salary Sheet</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <div class="pcoded-navigation-label">Report</div>
+                            <ul class="pcoded-item pcoded-left-item">
+                                <li class="pcoded-hasmenu">
+                                    <a href="javascript:void(0)" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-receipt"></i><b>W</b></span>
+                                        <span class="pcoded-mtext">Report</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="BillingReport" asp-controller="BillingReport" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Billing Report</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="MonthlyReport" asp-controller="ElectricityUnitSetup" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Electricity Report</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="ClientList" asp-controller="Ledger" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Client Ledger</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="Index" asp-controller="ClientStatement" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Client Statement</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="SalarySheetReport" asp-controller="SalarySheet" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Salary Sheet Report</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <div class="pcoded-navigation-label">SetUp</div>
+                            <ul class="pcoded-item pcoded-left-item">
+                                <li class="pcoded-hasmenu">
+                                    <a href="javascript:void(0)" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-receipt"></i><b>W</b></span>
+                                        <span class="pcoded-mtext">Set up</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            @*@if ((AuthorizationService.AuthorizeAsync(User, Permissions.ApplicationPermission.BillingReport)).Result.Succeeded)
+                                                {*@
+                                            <a asp-action="Index" asp-controller="Room" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Room</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                            @*}*@
+                                        </li>
+                                        <li class=" ">
+                                            @*@if ((AuthorizationService.AuthorizeAsync(User, Permissions.ApplicationPermission.InventoryReport)).Result.Succeeded)
+                                                {*@
+                                            <a asp-action="Index" asp-controller="Block" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Block</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                            @*}*@
+                                        </li>
+                                        <li class=" ">
+                                            @*@if ((AuthorizationService.AuthorizeAsync(User, Permissions.ApplicationPermission.SalesReport)).Result.Succeeded)
+                                                {*@
+                                            <a asp-action="Index" asp-controller="Client" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Client</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                            @*}*@
+                                        </li>
+                                        <li class=" ">
+                                            <a asp-action="Index" asp-controller="Electricity" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Electricity</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                        <li class=" ">
+                                            <a asp-action="Index" asp-controller="ElectricityUnitSetup" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Electricity Unit Setup</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                        <li class=" ">
+                                            <a asp-action="Index" asp-controller="Office" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Office</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                        <li class=" ">
+                                            <a asp-action="Index" asp-controller="Employee" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Employee</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                        <li class=" ">
+                                            <a asp-action="Index" asp-controller="Post" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Post</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+
+                                        <li class=" ">
+                                            <a asp-action="Index" asp-controller="FineSetup" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Fine </span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                        <li class=" ">
+                                            <a asp-action="Index" asp-controller="ElectricityFineSetup" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Electricity Fine </span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                        <li class=" ">
+                                            <a asp-action="Index" asp-controller="ClientBlockRoomSetup" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Client's Block & Room Setup </span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                        <li class=" ">
+                                            <a asp-action="Index" asp-controller="FiscalYear" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Fiscal Year </span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                        <li class=" ">
+                                            <a asp-action="Index" asp-controller="ClientRoomMaintenance" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Client Room Maintenance </span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <ul class="pcoded-item pcoded-left-item">
+                                <li class="pcoded-hasmenu">
+                                    <a href="javascript:void(0)" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-receipt"></i><b>W</b></span>
+                                        <span class="pcoded-mtext">Address Setup</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="Index" asp-controller="Provience" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Provience</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="Index" asp-controller="District" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">District</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="Index" asp-controller="LocalLevel" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">Local Level</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <div class="pcoded-navigation-label">User Setup</div>
+                            <ul class="pcoded-item pcoded-left-item">
+                                <li class="pcoded-hasmenu">
+                                    <a href="javascript:void(0)" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-user"></i><b>W</b></span>
+                                        <span class="pcoded-mtext">User Setup</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        <li class="">
+                                            <a asp-action="Index" asp-controller="Account" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">User List</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                        <li class=" ">
+                                            <a asp-action="Index" asp-controller="Roles" class="waves-effect waves-dark">
+                                                <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
+                                                <span class="pcoded-mtext">User Role</span>
+                                                <span class="pcoded-mcaret"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                    <div class="pcoded-content">
+                        <!-- Page-header start -->
+                        <!-- <div class="page-header">
+                            <div class="page-block">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <div class="page-header-title">
+                                            <h5 class="m-b-10">Dashboard</h5>
+                                            <p class="m-b-0">Welcome to Mega Able</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <ul class="breadcrumb">
+                                            <li class="breadcrumb-item">
+                                                <a href="index-2.html"> <i class="fa fa-home"></i> </a>
+                                            </li>
+                                            <li class="breadcrumb-item">
+                                                <a href="#!">Dashboard</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+                        <!-- Page-header end -->
+                        <div class="pcoded-inner-content">
+                            <!-- Main-body start -->
+                            <div class="main-body">
+                                <div class="page-wrapper">
+                                    <!-- Page-body start -->
+                                    <div class="page-body">
+                                        @RenderBody()
+                                    </div>
+                                    <!-- Page-body end -->
+                                </div>
+                                <div id="styleSelector"> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Warning Section Ends -->
+    <!-- Required Jquery -->
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/bower_components/jquery/js/jquery.min.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/bower_components/jquery-ui/js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="~/Community/html.phoenixcoded.net/mega-able/files/bower_components/popper.js/js/popper.min.js"></script>
+    <script type="text/javascript" src="~/Community/html.phoenixcoded.net/mega-able/files/bower_components/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/widget/excanvas.js"></script>
+    <!-- waves js -->
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/waves/js/waves.min.js"></script>
+    <!-- jquery slimscroll js -->
+    <script type="text/javascript" src="~/Community/html.phoenixcoded.net/mega-able/files/bower_components/jquery-slimscroll/js/jquery.slimscroll.js"></script>
+    <!-- modernizr js -->
+    <script type="text/javascript" src="~/Community/html.phoenixcoded.net/mega-able/files/bower_components/modernizr/js/modernizr.js"></script>
+    <!-- slimscroll js -->
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/js/SmoothScroll.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/js/jquery.mCustomScrollbar.concat.min.js"></script>
+    <!-- Chart js -->
+    <script type="text/javascript" src="~/Community/html.phoenixcoded.net/mega-able/files/bower_components/chart.js/js/Chart.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/js/bootstrap-growl.min.js"></script>
+    <!-- amchart js -->
+    <script src="~/Community/www.amcharts.com/lib/3/amcharts.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/widget/amchart/gauge.min.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/widget/amchart/serial.min.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/widget/amchart/light.min.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/widget/amchart/pie.min.js"></script>
+    <script src="~/Community/www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+    <!-- Google map js -->
+    <script src="~/Community/developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/google-maps/gmaps.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/js/animation.js"></script>
+    <!-- menu js -->
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/js/pcoded.min.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/js/vertical/vertical-layout.min.js"></script>
+    <!-- custom js -->
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/notification/notification.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/dashboard/custom-dashboard.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/js/script.js"></script>
+    <script src="~/select2/dist/js/select2.full.min.js"></script>
+    <script src="~/bootstrap-select/bootstrap-select.min.js"></script>
+    <script src="~/City/nepali.datepicker.v3.6 (1)/js/nepali.datepicker.v3.6.min.js"></script>
+    <script src="~/default/assets/js/pages/validation.js"></script>
+
+</body>
+
+
+<!-- Mirrored from html.phoenixcoded.net/mega-able/default/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 25 Aug 2021 08:20:00 GMT -->
+</html>
+@RenderSection("Scripts", required: false)
+<script>
+    $(document).ready(function () {
+        var mainInput = document.getElementsByClassName("nepali-datepicker");
+
+        /* Initialize Datepicker with options */
+        mainInput.nepaliDatePicker({
+            language: "english",
+            ndpYear: true,
+            ndpMonth: true,
+            ndpYearCount: 10
+        });
+    });
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // For select 2
+    $(".select2").select2();
+    $('.selectpicker').selectpicker();
+</script>
+
+@*<script>
+        $(document).ajaxSend(function (event, xhr, options) {
+
+            $('.spinner').css('display', 'block');
+
+        }).ajaxComplete(function (event, xhr, options) {
+
+            $('.spinner').css('display', 'none');
+
+        }).ajaxError(function (event, jqxhr, settings, exception) {
+
+            $('.spinner').css('display', 'none');
+
+        });
+
+        $(window).on('load', function () {
+            $('.spinner').css('display', 'none');
+        });
+    </script>*@
+@*<script>
+        document.onreadystatechange = function () {
+            var state = document.readyState
+            if (state == 'interactive') {
+                document.getElementById('contents').style.visibility = 'hidden';
+
+            } else if (state == 'complete') {
+                setTimeout(function () {
+                    document.getElementById('interactive');
+                    document.getElementById('load').style.visibility = 'hidden';
+                    document.getElementById('contents').style.visibility = 'visible';
+                }, 2000);
+            }
+        }
+    </script>*@
+
+

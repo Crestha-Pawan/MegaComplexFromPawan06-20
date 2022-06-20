@@ -1,0 +1,186 @@
+﻿@model FiboBilling.Src.ViewModel.DashBoardViewModel
+@{
+    ViewData["Title"] = "Home Page";
+    var client = await _clientrepo.GetAllClientAsync();
+    var clients = client.Where(x => x.Id == Model.ClientId);
+    decimal amount = 0;
+    decimal receivedAmount = 0;
+}
+@using FiboInfraStructure;
+
+@inject FiboBlock.InfraStructure.Repository.IClientRepository _clientrepo;
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="Gradient Able Bootstrap admin template made using Bootstrap 4 and it has huge amount of ready made feature, UI components, pages which completely fulfills any dashboard needs." />
+    <meta name="keywords" content="bootstrap, bootstrap admin template, admin theme, admin dashboard, dashboard template, admin template, responsive" />
+    <meta name="author" content="Phoenixcoded" />
+    <!-- Favicon icon -->
+    <link rel="icon" href="http://html.phoenixcoded.net/mega-able/files/assets/images/favicon.ico" type="image/x-icon">
+    <!-- Google font-->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet">
+    <link href="~/Community/html.phoenixcoded.net/mega-able/files/assets/icon/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <!-- waves.css -->
+    <link rel="stylesheet" href="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/waves/css/waves.min.css" type="text/css" media="all">
+    <!-- Required Fremwork -->
+    <link rel="stylesheet" type="text/css" href="~/Community/html.phoenixcoded.net/mega-able/files/bower_components/bootstrap/css/bootstrap.min.css">
+    <!-- waves.css -->
+    <link rel="stylesheet" href="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/waves/css/waves.min.css" type="text/css" media="all">
+    <!-- scrollbar.css -->
+    <!-- am chart export.css -->
+    <link rel="stylesheet" href="~/www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
+    <!-- radial chart.css -->
+    <link rel="stylesheet" href="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/chart/radial/css/radial.css" type="text/css" media="all">
+    <!-- Style.css -->
+    <link rel="stylesheet" type="text/css" href="~/Community/html.phoenixcoded.net/mega-able/files/assets/css/style.css">
+</head>
+<body>
+    <div class="row" style="margin-left:20px">
+        <div class="col-xl-4 col-md-6">
+            <div class="card">
+                <div class="card-block">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h4 class="text-c-green">@Model.Cash</h4>
+                            <h6 class="text-muted m-b-0"></h6>
+                        </div>
+                        <div class="col-4 text-right">
+                            <i class="ti-file f-28"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-c-green">
+                    <div class="row align-items-center">
+                        <div class="col-9">
+                            <p class="text-white m-b-0">Billing</p>
+                        </div>
+                        <div class="col-3 text-right">
+                            <i class="ti-stats-up text-white f-16"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-md-6">
+            <div class="card">
+                <div class="card-block">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h4 class="text-c-blue">
+                                @foreach (var items in Model.Electricities)
+                                {
+                                    amount += items.Amount.ToDecimal();
+                                }
+                                @amount
+                            </h4>
+                            <h6 class="text-muted m-b-0">
+                            </h6>
+                        </div>
+                        <div class="col-4 text-right">
+                            <i class="ti-light-bulb f-28"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-c-blue">
+                    <div class="row align-items-center">
+                        <div class="col-9">
+                            <p class="text-white m-b-0">Electricity Charge</p>
+                        </div>
+                        <div class="col-3 text-right">
+                            <i class="ti-stats-up text-white f-16"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-8 col-md-12">
+            <div class="card table-card">
+                <div class="card-header">
+                    <h3>Billing </h3><hr />-<h5><b style="text-transform:uppercase">@ViewBag.CurrentMonth</b></h5>
+                </div>
+                <div class="card-block">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="">
+                                <tr>
+                                    <th>
+                                        <b>Client Name</b>
+                                    </th>
+                                    @*<th><b>Total</b></th>
+                                        <th><b>Debit</b></th>
+                                            <th><b>Credit</b></th>*@
+                                    <th><b>Cash Received</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.dashBoardViewModels)
+                                {
+                                    
+                                    var clientss = await _clientrepo.GetByIdAsync((long)item.ClientId);
+                                    <tr>
+                                        <td>
+                                            <div class="d-inline-block align-middle">
+                                                <div class="d-inline-block">
+                                                    <h6> @clientss.OwnerName</h6>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@item.Notreceived</td>
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        @* <div class="text-right m-r-20">
+                            <a href="#!" class=" b-b-primary text-primary">View all Projects</a>
+                            </div>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+    <script type="text/javascript" src="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/google-maps/gmaps.js"></script>
+
+    <!-- menu js -->
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/js/pcoded.min.js"></script>
+    <script src="~/Community/html.phoenixcoded.net/mega-able/files/assets/js/vertical/vertical-layout.min.js"></script>
+    <!-- custom js -->
+    <script type="text/javascript" src="~/Community/html.phoenixcoded.net/mega-able/files/assets/pages/dashboard/custom-dashboard.js"></script>
+    <script type="text/javascript" src="~/Community/html.phoenixcoded.net/mega-able/files/assets/js/script.js"></script>
+</body>
+</html>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(message,type) {
+            $.growl({
+                message: message
+            }, {
+                type: type,
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {from: 'top', align: 'right'},
+                delay: 2500,
+                animate: { enter: 'animated rotateIn', exit: 'animated rotateIn'},
+                offset: {x: 30,y: 30}
+            });
+        };
+        notify('@ViewBag.Message','success');
+    });
+
+    </script>
+}
+

@@ -1,0 +1,34 @@
+﻿@model FiboUser.Src.ViewModel.UpdateViewModel
+@{
+}
+
+<div class="col-lg-6">
+    <div class="card">
+        <div class="card-body">
+            <form class="form-horizontal form-material" id="loginform" asp-action="Update" asp-controller="Account">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="UserId" />
+                <div class="form-group">
+                    <div class="col-xs-12">
+                        <label>User Name</label>
+                        <input class="form-control" asp-for="UserName" type="text" required="" placeholder="Name" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group" id="myDIV" style="display:none;text-align:left;font-family: cursive;font-size:14px">
+                    <label class="text-danger">UserName must contain atleast 8 characters!!!</label>
+                </div>
+                <div class="form-group ">
+                    <div class="col-xs-12">
+                        <label>Email Address</label>
+                        <input class="form-control" asp-for="EmailAddress" type="email" required="" placeholder="Email" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-4">
+                        <button class="btn btn-success text-uppercase waves-effect waves-light btnRegister" type="submit">SUbmit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

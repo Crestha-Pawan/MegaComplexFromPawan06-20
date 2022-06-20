@@ -1,0 +1,270 @@
+﻿@model FiboBlock.Src.ViewModel.ClientViewModel
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "ClientStatement";
+    int billNo = 0;
+    decimal? pmTotalDr = 0;
+    var blockList = await _blockRepo.GetAllBlockAsync();
+    var roomList = await _roomRepo.GetAllRoomAsync();
+    var clientBlock = await _clientBlockRepo.GetAllClientBlockRoomSetupAsync();
+    decimal credit = 0;
+    decimal? balance = 0;
+    decimal? debit = 0;
+    decimal? pmBalance = 0;
+    var Block = string.Empty;
+    var Room = string.Empty;
+}
+@using FiboInfraStructure;
+@inject FiboBlock.InfraStructure.Repository.IBlockRepository _blockRepo;
+@inject FiboBlock.InfraStructure.Repository.IRoomRepository _roomRepo;
+@inject FiboBlock.InfraStructure.Repository.IClientBlockRoomSetupRepository _clientBlockRepo;
+
+<script type="text/javascript">
+    function CallPrint(strid) {
+        var mywindow = document.getElementById('profile');
+        var popupWin = window.open('', "Kaamana Format", 'width=350,height=150,location=no,left=200px');
+
+        popupWin.document.open();
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css"  href="../Content/bootstrap.min.css" /></head><body onload="window.print()">')
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css" href="../Content/print.css" /></head><body onload="window.print()">')
+        popupWin.document.write(mywindow.innerHTML);
+        popupWin.document.write('</html>');
+
+        popupWin.document.close();
+
+    }
+
+</script>
+@using (Html.BeginForm("ClientStatement", "ClientStatement", FormMethod.Get, new { @class = "form-view-data" }))
+{
+    <div class="row" style="text-align:right">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <button type="button" class="btn"
+                    style="margin-bottom:20px;background-color:darkblue;padding-top: 3px;
+    padding-bottom: 5px;padding-left:5px;color:white;font-weight:bold"
+                    onclick="CallPrint('strid')" data-ma-action="print">
+                <i class="mdi mdi-cloud-print"></i> Print
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" style="float: right"
+                    onclick="window.location.href = '@Url.Action("LedgerExportToExcel", "ClientStatement", new { clientId = Model.ClientId })'">
+                Export Excel
+            </button>
+        </div>
+    </div>
+}
+    <div class="card" id="profile">
+        <div class="card-header"><h4>Client Information</h4><hr /></div>
+        <div class="card-body">
+            <table width="100%">
+                <tr>
+                    <td>
+                        <label>Business Name</label>
+                        <label>@Model.Clients.FirstOrDefault().BusinessName</label>
+                    </td>
+                    <td>
+                        <label>Owner Name</label>
+                        <label>@Model.Clients.FirstOrDefault().OwnerName</label>
+                    </td>
+                    <td>
+                        <label>Contact</label>
+                        <label>@Model.Clients.FirstOrDefault().ContactNumber</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>RoomNo</label>
+                        <label>
+                            @foreach (var _detail in clientBlock.Where(x => x.ClientId == Model.Clients.FirstOrDefault().Id).ToList())
+                            {
+                                if (_detail.RoomId.Contains(","))
+                                {
+                                    string[] _tmpRoom = _detail.RoomId.Split(",");
+                                    foreach (var id in _tmpRoom)
+                                    {
+                                        var room = roomList.Where(x => x.Id == long.Parse(id)).FirstOrDefault();
+                                        Room += room.Name + ",";
+                                    }
+                                }
+                                else
+                                {
+                                    var room = roomList.Where(x => x.BlockId == _detail.BlockId).FirstOrDefault();
+                                    Room += room.Name + ",";
+                                }
+                            }
+                            @Room
+
+                        </label>
+                    </td>
+                    <td>
+                        <label>Block No</label>
+                        <label>
+                            @foreach (var _detail in clientBlock.Where(x => x.ClientId == Model.Clients.FirstOrDefault().Id).ToList())
+                            {
+                                var block = await _blockRepo.GetByIdAsync((long)_detail.BlockId);
+                                Block += block.Name + ",";
+                            }
+                            @Block
+                        </label>
+                    </td>
+                    <td>
+                        <label>Opening Balance</label>
+                        <label>@Model.Clients.FirstOrDefault().Collateral</label>
+                        <br />
+                        <label>Closing Balance</label>
+                        @foreach (var item in Model.Billings)
+                        {
+                            credit += item.CashReceived.ToDecimal()+item.DuePaid.ToDecimal();
+                        }
+                        @{ var openingBal = Model.Clients.FirstOrDefault().Collateral; }
+                        @if (openingBal.ToDecimal() > credit)
+                        {
+                            <label style="color:red">@credit</label>}
+                        else
+                        {
+                            <label style="color:green">@credit</label>}
+                    </td>
+                </tr>
+            </table>
+
+
+            @*<div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-4" style="text-align:left">
+                            <label>Business Name</label>
+                            <label>@Model.Clients.FirstOrDefault().BusinessName</label>
+                        </div>
+                        <div class="col-lg-4" style="text-align:left">
+                            <label>Owner Name</label>
+                            <label>@Model.Clients.FirstOrDefault().OwnerName</label>
+                        </div>
+                        <div class="col-lg-4" style="text-align:left">
+                            <label>Contact</label>
+                            <label>@Model.Clients.FirstOrDefault().ContactNumber</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-4" style="text-align:left">
+                            <label>RoomNo</label>
+                            <label>
+                                @{ var room = roomList.Where(x=>x.Id==Model.Clients.FirstOrDefault().RoomId).FirstOrDefault(); }
+                                @room.Name
+                            </label>
+                        </div>
+                        <div class="col-lg-4" style="text-align:left">
+                            <label>Block No</label>
+                            <label>
+                                @{ var block = blockList.Where(x=>x.Id==Model.Clients.FirstOrDefault().BlockId).FirstOrDefault(); }
+                                @block.Name
+                            </label>
+                        </div>
+                        <div class="col-lg-4" style="text-align:left">
+                            <label>Opening Balance</label>
+                            <label>@Model.Clients.FirstOrDefault().Collateral</label>
+                            <br />
+                            <label>Closing Balance</label>
+                            @foreach (var item in Model.Billings)
+                            {
+                                credit += item.CreditTotal.ToDecimal();
+                            }
+                            @{ var openingBal = Model.Clients.FirstOrDefault().Collateral; }
+                            @if (openingBal.ToDecimal() > credit)
+                            {
+                                <label style="color:red">@credit</label>}
+                            else
+                            {
+                                <label style="color:green">@credit</label>}
+
+                        </div>
+                    </div>
+                </div>*@
+        </div>
+        <hr />
+        <div class="card-header"><h4>Client Statement</h4><hr /></div>
+        <div class="table-responsive">
+            <div class="tableFixHead">
+                <table class="table table-bordered table-striped" BORDER="1" width="100%">
+                    <thead style="background-color: #FFFFFFCC;">
+                        <tr>
+                            <th>
+                                Date
+                            </th>
+                            <th>
+                                Particulars
+                            </th>
+
+                            <th>
+                                Dr
+                            </th>
+                            <th>
+                                Cr
+                            </th>
+                            <th>
+                                Balance
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Billings)
+                        {
+                            decimal due = 0;
+                            due = item.DuePaid.ToDecimal();
+                            pmTotalDr = item.GrandTotal.ToDecimal() + item.Fine.ToDecimal() + item.ElectricityFineAmount.ToDecimal() - item.Discount.ToDecimal()-item.DuePaid.ToDecimal();
+                            billNo++;
+                            pmBalance += pmTotalDr;
+                            balance = pmTotalDr-item.CashReceived.ToDecimal();
+                            debit += balance;
+                            DateTime? dt = item.CreatedDate;
+                        <tr>
+                            <td>
+                                @dt.ToNepDate()
+                            </td>
+                            <td>
+                                <label>Bill No. @item.BillNo</label>
+                            </td>
+                            <td>
+                                @pmTotalDr
+                            </td>
+                            <td>
+                                @if (due > pmTotalDr)
+                                {
+                                    <span>@due.ToString().Trim('-')</span>
+                                }
+                                else
+                                {
+                                    @item.CashReceived
+                                }
+                            </td>
+                            <td>
+                                @if (due > pmTotalDr)
+                                {
+                                    <span>@due.ToString().Trim('-')</span>
+                                }
+                                else
+                                {
+                                    @balance
+                                }
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2" style="text-align:right">Total</td>
+
+                            <td>
+                                @pmBalance
+                            </td>
+                            <td>
+                                @credit
+                            </td>
+                            <td>
+                                @debit
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+

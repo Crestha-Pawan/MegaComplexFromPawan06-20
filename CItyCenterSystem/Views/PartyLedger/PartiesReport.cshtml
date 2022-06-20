@@ -1,0 +1,137 @@
+﻿@model FiboParty.Src.ViewModel.PartiesReportVM
+@{
+    int SN = 1;
+    decimal? total = 0;
+    decimal dr = 0;
+    decimal cr = 0;
+    string debit = "Dr";
+    string credit = "Cr";
+
+    var fiscalyear = await _fiscalrepos.GetAllFiscalYearAsync();
+    var fiscalyr = fiscalyear.Where(x => x.IsActive()).FirstOrDefault();
+
+}
+@using FiboInfraStructure;
+@inject FiboParty.Infrastructure.Repository.ILedgerRepository _repo;
+@inject FiboParty.Infrastructure.Repository.IPartyRepository _prepo;
+@inject FiboOffice.InfraStructure.Repository.IFiscalYearRepository _fiscalrepos;
+<style>
+    .btn-success {
+        background-color: #40A214;
+    }
+</style>
+<script type="text/javascript">
+    function CallPrint(strid) {
+        var mywindow = document.getElementById('profile');
+        var popupWin = window.open('', "Kaamana Format", 'width=350,height=150,location=no,left=200px');
+        popupWin.document.open();
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css"  href="../Content/bootstrap.min.css" /></head><body onload="window.print()">')
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css" href="../Content/print.css" /></head><body onload="window.print()">')
+        popupWin.document.write(mywindow.innerHTML);
+        popupWin.document.write('</html>');
+        popupWin.document.close();
+
+    }
+
+</script>
+<div class="col-sm-12">
+    <div class="card">
+        @using (Html.BeginForm("PartiesReport", "PartyLedger", FormMethod.Get, new { @class = "form-view-data" }))
+        {
+            <div class="card-body">
+                <h6 style="text-align:center">Active Fiscal Year :<b style="color:red">@fiscalyr.FiscalYearName</b> </h6>
+                <div class=" col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label for="Name">Party Name</label>
+                            <select asp-for="PartyId" asp-items="Model.PartyList" class="select2 form-control custom-select" id="PartyId"></select>
+                        </div>
+                        <div class="btn btn-group">
+                            <button type="submit" class="btn btn-success">Search</button>
+                            <button type="button" class="btn btn-secondary" asp-action="PartiesReport" asp-controller="PartyLedger">Show All</button>
+                            <button type="button" class="btn btn-success"
+                                    style="background-color:darkblue;color:white;font-weight:bold"
+                                    onclick="CallPrint('strid')" data-ma-action="print">
+                                <i class="mdi mdi-cloud-print"></i> Print
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-header">
+            <h4><b>Party Report</b></h4>
+            <hr />
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" id="profile">
+                <div class="tableFixHead">
+                    <table class="table table-bordered table-striped" BORDER="1" width="100%">
+                        <thead style="background-color: #0e4d5496;">
+                            <tr>
+                                @*<th>Last Entry Date</th>*@
+                                <th>
+                                    Name
+                                </th>
+                                <th>Debit</th>
+                                <th>Credit</th>
+                                <th>Dr/Cr</th>
+                                <th>Balance</th>
+                                <th style="text-align:center">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.PartiesReportVMList)
+                            {
+                                var de = item.Dr;
+                                var ce = item.Cr;
+                                var party = await _prepo.GetByIdAsync((long)item.PartyId);
+                                <tr style="text-align:center">
+                                    @*<td>
+                                            @item.EntryDate.ToDateTime().ToNepDate()
+                                        </td>*@
+                                    <td>@party.Name</td>
+
+                                    <td>@item.Dr</td>
+                                    <td>@item.Cr</td>
+                                    <td>
+                                        @if (de.ToDecimal() > ce.ToDecimal())
+                                        {
+                                            @debit;
+                                        }
+                                        else
+
+                                        {
+                                            @credit;
+                                        }
+                                    </td>
+                                    <td>@item.Balance</td>
+                                    <td>
+                                        <a href="@Url.Action("MonthlyReport","PartyLedger",new {id=item.PartyId })">
+                                            <i class="ti-eye" data-toggle="tooltip" title="Monthly Report"></i>
+                                        </a>
+                                        <a href="@Url.Action("PartyDetails","PartyLedger",new {id=item.PartyId })">
+                                            <i class="ti-eye" style="color:red" data-toggle="tooltip" title="Total Report"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script type="text/javascript">
+
+    </script>
+}

@@ -1,0 +1,167 @@
+﻿@model FiboParty.Src.Dto.PartyDto
+@{
+}
+
+<form asp-action="Update" asp-controller="Party" method="post" class="needs-validation" novalidate>
+ @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title"><b>Update Party</b></h5>
+            @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>*@
+ </div>
+
+        <div class="modal-body">
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label for="Name">Name<span style="color:red">*</span></label><br />
+                         <input type="text" asp-for="Name" class="form-control" id="Name" required autocomplete="off" />
+
+                        <div class="invalid-feedback">
+
+                            Please Enter A Name.
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-6">
+
+                        <label for="Email">Email Address<span style="color:red">*</span></label><br />
+
+                        <input type="text" asp-for="Email" class="form-control" id="Email" required autocomplete="off" />
+
+                        <div class="invalid-feedback">
+
+                            Please Enter A Email Address.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-12">
+
+                <div class="row">
+
+                    <div class="col-lg-6">
+
+                        <label for="Contact Number">Contact Number<span style="color:red">*</span></label><br />
+
+                        <input type="text" asp-for="ContactNumber" class="form-control" id="ContactNumber" required autocomplete="off" />
+
+                        <div class="invalid-feedback">
+
+                            Please Enter A Contact Number.
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-6">
+
+                        <label for="Address">Address<span style="color:red">*</span></label><br />
+
+                        <input type="text" asp-for="Address" class="form-control" id="Address" required autocomplete="off" />
+
+                        <div class="invalid-feedback">
+
+                            Please Enter A Address.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-12">
+
+                <div class="row">
+
+                    <div class="col-lg-6">
+
+                        <label for="Parties Created Date">Parties Created Date<span style="color:red">*</span></label><br />
+
+                        <input type="text" asp-for="PartiesCreatedDate" class="form-control nepali-datepicker" id="PartiesCreatedDate" required autocomplete="off" />
+
+                        <div class="invalid-feedback">
+
+                            Please Enter A Parties Created Date.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button type="submit" class="btn  btn-success"><i class="feather icon-check-square"></i> Submit</button>
+
+        </div>
+
+    </div>
+
+</form>
+
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+@if (ViewBag.Message != null)
+
+{
+
+    <script type="text/javascript">
+
+    'use strict';
+
+    $(window).on('load', function () {
+
+        function notify(message) {
+
+            $.notify({
+
+                message: message,
+
+                type: 'danger',
+
+                allow_dismiss: false,
+
+                label: 'Cancel',
+
+                className: 'btn-xs btn-danger',
+
+                placement: { from: 'bottom', align: 'right' },
+
+                delay: 2500,
+
+                animate: { enter: 'animated fadeInRight', exit: 'animated fadeOutRight' },
+
+                offset: { x: 30, y: 30 }
+
+            });
+
+        };
+
+        /**/
+
+        notify('@ViewBag.Message');
+
+    /**/
+
+    });
+
+    </script>
+
+}

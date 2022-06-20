@@ -1,0 +1,346 @@
+﻿@model FiboBlock.Src.ViewModel.ClientViewModel
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+
+    var clientList = await _clientRepo.GetAllClientAsync();
+    var client = clientList.Where(x => x.Id == ViewBag.ClientID).FirstOrDefault();
+
+    int count = 1;
+    decimal? balance = 0;
+    decimal? totalDr = 0;
+    decimal? totalCr = 0;
+    decimal? pmBalance = 0;
+    decimal? pmTotalDr = 0;
+    decimal? pmTotalCr = 0;
+    decimal? totalBalance = 0;
+    decimal? pmTotalBalance = 0;
+    var blockList = await _blockRepo.GetAllBlockAsync();
+    var roomList = await _roomRepo.GetAllRoomAsync();
+    var clientBlock = await _clientBlockRepo.GetAllClientBlockRoomSetupAsync();
+    decimal credit = 0;
+    decimal debit = 0;
+    var _block = string.Empty;
+    var _room = string.Empty;
+}
+@using FiboInfraStructure;
+@inject FiboBilling.InfraStructure.Repository.IBillingDetailRepository _bDRepo;
+@inject FiboBlock.InfraStructure.Repository.IClientRepository _clientRepo;
+@inject FiboOffice.InfraStructure.Repository.IYearRepository _yearRepo;
+@inject FiboOffice.InfraStructure.Repository.IMonthRepository _monthRepo;
+@inject FiboBlock.InfraStructure.Repository.IRoomRepository _roomRepo;
+@inject FiboBlock.InfraStructure.Repository.IBlockRepository _blockRepo;
+@inject FiboBlock.InfraStructure.Repository.IClientBlockRoomSetupRepository _clientBlockRepo;
+
+<script type="text/javascript">
+    function CallPrint(strid) {
+        var mywindow = document.getElementById('profile');
+        var popupWin = window.open('', "Kaamana Format", 'width=350,height=150,location=no,left=200px');
+
+        popupWin.document.open();
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css"  href="../Content/bootstrap.min.css" /></head><body onload="window.print()">')
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css" href="../Content/print.css" /></head><body onload="window.print()">')
+        popupWin.document.write(mywindow.innerHTML);
+        popupWin.document.write('</html>');
+
+        popupWin.document.close();
+
+    }
+
+</script>
+<div class="col-lg-12">
+    <div class="card">
+        <div class="card-body">
+            @using (Html.BeginForm("ClientLedger", "Ledger", FormMethod.Post, new { @class = "form-view-data" }))
+            {
+                @Html.HiddenFor(x => x.ClientId)
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <label>From Date</label>
+                                @Html.TextBoxFor(x => x.FromMiti, "{0:yyyy/MM/dd }", new { @class = "form-control nepali-datepicker", @placeholder = "yyyy/MM/dd", @autocomplete = "off" })
+                            </div>
+                            <div class="col-lg-3">
+                                <label>To Date</label>
+                                @Html.TextBoxFor(x => x.ToMiti, "{0:yyyy/MM/dd }", new { @class = "form-control nepali-datepicker", @placeholder = "yyyy/MM/dd", @autocomplete = "off" })
+                            </div>
+                            <div class="btn btn-group">
+                                <button type="submit" class="btn btn-success">Search</button>
+                                <button type="button" class="btn btn-success"
+                                        style="background-color:darkblue;color:white;font-weight:bold"
+                                        onclick="CallPrint('strid')" data-ma-action="print">
+                                    <i class="mdi mdi-cloud-print"></i> Print
+                                </button>
+                                <button type="button" class="btn btn-secondary" style="float: right"
+                                        onclick="window.location.href = '@Url.Action("LedgerExportToExcel","Ledger", new { clientId=Model.ClientId})'">
+                                    Export Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+<div class="col-sm-12" id="profile">
+    <div class="card">
+        <div class="card-header"><h4>Client Information</h4><hr /></div>
+        <div class="card-body">
+            <table width="100%">
+                <tr>
+                    <td>
+                        <label>Business Name</label>
+                        <label>@Model.Clients.FirstOrDefault().BusinessName</label>
+                    </td>
+                    <td>
+                        <label>Owner Name</label>
+                        <label>@Model.Clients.FirstOrDefault().OwnerName</label>
+                    </td>
+                    <td>
+                        <label>Contact</label>
+                        <label>@Model.Clients.FirstOrDefault().ContactNumber</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>RoomNo</label>
+                        <label>
+                            @foreach (var _detail in clientBlock.Where(x => x.ClientId == Model.Clients.FirstOrDefault().Id).ToList())
+                            {
+                                if (_detail.RoomId.Contains(","))
+                                {
+                                    string[] _tmpRoom = _detail.RoomId.Split(",");
+                                    foreach (var id in _tmpRoom)
+                                    {
+                                        var room = roomList.Where(x => x.Id == long.Parse(id)).FirstOrDefault();
+                                        _room += room.Name + ",";
+                                    }
+                                }
+                                else
+                                {
+                                    var room = roomList.Where(x => x.BlockId == _detail.BlockId).FirstOrDefault();
+                                    _room += room.Name + ",";
+                                }
+                            }
+                            @_room
+
+                        </label>
+                    </td>
+                    <td>
+                        <label>Block No</label>
+                        <label>
+                            @foreach (var _detail in clientBlock.Where(x => x.ClientId == Model.Clients.FirstOrDefault().Id).ToList())
+                            {
+                                var block = await _blockRepo.GetByIdAsync((long)_detail.BlockId);
+                                _block += block.Name + ",";
+                            }
+                            @_block
+                        </label>
+                    </td>
+                    <td>
+                        <label>Opening Balance / Collatterol</label>
+                        <label>@Model.Clients.FirstOrDefault().Collateral</label>
+                        <br />
+                        <label>Closing Balance</label>
+                        @foreach (var item in Model.Billings)
+                        {
+                            credit += item.CashReceived.ToDecimal()+item.DuePaid.ToDecimal();
+                        }
+                        @{ var openingBal = Model.Clients.FirstOrDefault().Collateral; }
+                        @if (openingBal.ToDecimal() > credit)
+                        {
+                            <label style="color:red">@credit</label>}
+                        else
+                        {
+                            <label style="color:green">@credit</label>}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label></label>
+                        @foreach (var item in Model.Billings)
+                        {
+                            balance += item.CashReceived.ToDecimal() + item.DuePaid.ToDecimal();
+                            totalBalance += item.GrandTotal.ToDecimal() + item.Fine.ToDecimal() + item.ElectricityFineAmount.ToDecimal() - item.Discount.ToDecimal();
+                            totalDr = totalBalance - balance;
+                            totalCr = balance - totalBalance;
+                        }
+                        @if (balance > totalBalance)
+                        {
+                            <label style="color:green"> Cr(Advance) : @totalCr</label>
+                        }
+                        else
+                        {
+                            <lable style="color:red">Dr(Due) : @totalDr</lable>
+                        }
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <hr />
+        <div class="card-body">
+            @*<h4>Client Ledger of @client.OwnerName </h4>*@
+            <hr />
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table class="table table-bordered table-striped" BORDER="1" width="100%">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+                                <th>
+                                    Date
+                                </th>
+                                <th>
+                                    Particular
+                                </th>
+                                <th>Vch No.</th>
+                                <th>
+                                    Block
+                                </th>
+                                <th>Room</th>
+                                <th>
+                                    Room Rent
+                                </th>
+                                <th>
+                                    Unit
+                                </th>
+                                <th>
+                                    Unit Charge
+                                </th>
+                                <th>Rent Fine</th>
+                                <th>Electricity Fine</th>
+                                <th>
+                                    Total Amount
+                                </th>
+                                <th>
+                                    Received Amount
+                                </th>
+                                <th>
+                                    Due Amount
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Billings)
+                            {
+
+                                DateTime? dt = item.CreatedDate;
+                                var detail = await _bDRepo.GetAllBillingAsync();
+                                decimal rent = 0;
+                                decimal unit = 0;
+                                decimal electricity = 0;
+                                decimal due = 0;
+                                due = item.DuePaid.ToDecimal();
+                                //decimal debit =0;
+                                //decimal credit =0;
+                                pmTotalDr = item.GrandTotal.ToDecimal() + item.Fine.ToDecimal() + item.ElectricityFineAmount.ToDecimal() - item.Discount.ToDecimal() - item.DuePaid.ToDecimal();
+                                pmTotalCr = item.CashReceived.ToDecimal();
+                                //var room = await _roomRepo.GetByIdAsync((long)item.RoomId);
+                                //var block = await _blockRepo.GetByIdAsync((long)item.BlockId);
+                                string YearMonth = string.Empty;
+                                string Room = string.Empty;
+                                string Block = string.Empty;
+
+
+
+                                foreach (var _detail in detail.Where(x => x.BillingId == item.Id).ToList())
+                                {
+                                    rent += _detail.RentAmount.ToDecimal();
+                                    electricity += _detail.ElectricityBillAmount.ToDecimal();
+                                    unit += _detail.ElectricityUnit.ToDecimal();
+                                    //total += _detail.Total.ToDecimal();
+                                    //debit += _detail.Debit.ToDecimal();
+                                    //credit += _detail.Credit.ToDecimal();
+                                }
+                                <tr>
+                                    <td>
+                                        @dt.ToNepDate()
+                                    </td>
+                                    <td>
+                                        @foreach (var _detail in detail.Where(x => x.BillingId == item.Id).GroupBy(x => x.MonthId).Select(x => x.First()).ToList())
+                                        {
+                                            var year = await _yearRepo.GetByIdAsync((long)_detail.YearId);
+                                            var month = await _monthRepo.GetByIdAsync((long)_detail.MonthId);
+                                            YearMonth = string.Format("{0}/{1}", year.YearName, month.MonthName);
+                                            @YearMonth
+                                            <br /><br />
+                                        }
+                                    </td>
+                                    <td>
+                                        @item.BillNo
+                                    </td>
+                                    <td>
+                                        @foreach (var _detail in detail.Where(x => x.BillingId == item.Id).GroupBy(x => x.BlockId).Select(x => x.First()).ToList())
+                                        {
+                                            var block = await _blockRepo.GetByIdAsync((long)_detail.BlockId);
+                                            Block = block.Name;
+                                            @Block
+                                            <br /><br />
+                                        }
+                                    </td>
+                                    <td>
+                                        @foreach (var _detail in detail.Where(x => x.BillingId == item.Id).GroupBy(x => x.RoomId).Select(x => x.First()).ToList())
+                                        {
+                                            var room = await _roomRepo.GetByIdAsync((long)_detail.RoomId);
+                                            Room = room.Name;
+                                            @Room
+                                            <br /><br />
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @rent
+                                    </td>
+                                    <td>
+                                        @unit
+                                    </td>
+                                    <td>
+                                        @electricity
+                                    </td>
+                                    <td>@item.Fine</td>
+                                    <td>@item.ElectricityFineAmount</td>
+                                    <td>
+                                        @pmTotalDr
+                                    </td>
+                                    <td>
+                                        @if (due > pmTotalDr)
+                                        {
+                                            <span>@due.ToString().Trim('-')</span><span style="color:red;"><b>(Due Received)</b></span>
+                                        }
+                                        else
+                                        {
+                                            @item.CashReceived
+                                        }
+                                    </td>
+                                    <td>
+                                        @{
+                                            pmTotalBalance = pmTotalDr - pmTotalCr;
+                                        }
+                                        @if (pmTotalBalance.ToString().Contains('-'))
+                                        {
+                                            <span>(@pmTotalBalance.ToString().Trim('-'))</span>
+                                        }
+                                        else
+                                        {
+                                            @pmTotalBalance
+                                        }
+                                    </td>
+                                </tr>
+                                count++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@section Scripts
+{
+
+}

@@ -1,0 +1,190 @@
+﻿@model FiboParty.Src.ViewModel.LedgerViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+    decimal dr = 0;
+    decimal cr = 0;
+    string debit = "Dr";
+    string credit = "Cr";
+
+    var fiscalyear = await _fiscalrepos.GetAllFiscalYearAsync();
+    var fiscalyr = fiscalyear.Where(x => x.IsActive()).FirstOrDefault();
+}
+@using FiboInfraStructure;
+@using FiboInfraStructure.Common;
+@inject FiboParty.Infrastructure.Repository.IPartyRepository _partyRepo;
+@inject FiboOffice.InfraStructure.Repository.IFiscalYearRepository _fiscalrepos;
+<style>
+</style>
+
+<div class="col-lg-12">
+    <div class="card">
+        <form asp-action="Index" asp-controller="PartyLedger" method="post">
+            <div class="card-body">
+                <h6 style="text-align:center">Active Fiscal Year :<b style="color:red">@fiscalyr.FiscalYearName</b> </h6>
+                <div class=" col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label>Party Name</label>
+                            <select asp-for="PartyId" asp-items="Model.PartyList" class="select2 custom-select form-control "> </select>
+                        </div>
+                        <div class=" col-lg-6" style="text-align:left">
+                            <div class="btn btn-group">
+                                <button type="submit" class="btn btn-success"><i class=" ti-filter ">Search</i></button>
+                                <button type="button" class=" btn btn-secondary" asp-action="Index" asp-controller="PartyLedger">
+                                    Show All
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <hr />
+        <div class="card-body">
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table class="table table-bordered">
+                        <thead style="background-color: #0e4d5496;">
+                            <tr>
+                                <th>
+                                    Created Date
+                                </th>
+                                <th>
+                                    Name
+                                </th>
+                                <th>Debit</th>
+                                <th>Credit</th>
+                                <th>Dr/Cr</th>
+                                <th>Balance</th>
+                                <!--<-->@*th>Insurance Expire</th>
+                                    <th>Route Permit Expire</th>
+                                    <th>Janch Pass Expire</th>*@
+                                <th style="text-align:center">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Ledgers.Where(x => x.FiscalYearId == fiscalyr.Id))
+                            {
+                                var de = item.Debit;
+                                var ce = item.Credit;
+                                var party = await _partyRepo.GetByIdAsync((long)item.PartyId);
+                                <tr>
+                                    <td>
+                                        @item.CreatedDate.ToDateTime().ToNepDate()
+                                    </td>
+                                    <td>
+                                        @party.Name
+                                    </td>
+                                    <td>
+                                        @CommaSeperatedDigit.getCommaSeperatedValue(item.Debit.ToString())
+                                    </td>
+                                    <td>@CommaSeperatedDigit.getCommaSeperatedValue(item.Credit.ToString())</td>
+                                    <td>
+                                        @if (de.ToDecimal() > ce.ToDecimal())
+                                        {
+                                            @debit;
+                                        }
+                                        else
+
+                                        {
+                                            @credit;
+                                        }
+                                    </td>
+                                    <td>
+                                        @CommaSeperatedDigit.getCommaSeperatedValue(item.BalanceAmount.ToString())
+                                    </td>
+                                    <td style="text-align:center">
+                                        <a type="button" class="btn-sm btn-icon btn-primary"
+                                           asp-action="AddEntry" asp-controller="PartyLedger" asp-route-id="@item.Id">
+                                            <i class="feather icon-plus-circle"></i>AddEntry
+                                        </a>
+                                        @*<a type="button" class=" btn-icon btn-sm btn-secondary" asp-action="Update" asp-controller="Ledger" asp-route-id="@item.Id">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>*@
+                                        @*<a type="button" class=" btn-icon btn-sm btn-danger" href="#!" data-toggle="modal"
+                                            LedgerId="@item.Id" data-target="#myModal"><i class="fa fa-trash"></i></a>*@
+
+                                    </td>
+
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" id="DeleteBody">
+
+        <!-- /.modal-content -->
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@section Scripts
+{
+    <script type="text/javascript">
+        $("#myModal").on('show.bs.modal', function (e) {
+            const LedgerId = $(e.relatedTarget).attr('LedgerId');
+            const type = $(e.relatedTarget).attr('ReferenceType');
+
+            if (LedgerId > 0) {
+                if (type == null) {
+                    var url = '@Url.Action("Delete", "Ledger")' + "?id=" + LedgerId;
+                    $("#DeleteBody").load(url, function () {
+
+                        $("#myModal").modal('show');
+                    });
+                }
+                else {
+                    var url = '@Url.Action("Update", "Ledger")' + "?id=" + LedgerId;
+                    $("#DeleteBody").load(url, function () {
+
+                        $("#myModal").modal('show');
+                    });
+                }
+            }
+        })
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(message) {
+            $.notify({
+                message: message,
+                type: 'inverse',
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: { from: 'bottom', align: 'right' },
+                delay: 2500,
+                animate: { enter: 'animated fadeInRight', exit: 'animated fadeOutRight' },
+                offset: { x: 30, y: 30 }
+            });
+        };
+        /**/
+        notify('@ViewBag.Message');
+    /**/
+    });
+    </script>
+}

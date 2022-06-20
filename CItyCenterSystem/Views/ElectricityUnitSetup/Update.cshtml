@@ -1,0 +1,142 @@
+﻿@model FiboBlock.Src.Dto.ElectricityUnitSetupDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form asp-action="Update" asp-controller="ElectricityUnitSetup" method="post" class="needs-validation" novalidate>
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.CreatedBy)
+    @Html.HiddenFor(x => x.CreatedDate)
+    @Html.AntiForgeryToken()
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6">
+                    <label for="Month">Month<span style="color:red">*</span></label><br />
+                    <select type="text" asp-items="Model.MonthList" asp-for="MonthId" class="select2 custom-select form-control" id="Month" required autocomplete="off"></select>
+                    <div class="invalid-feedback">
+                        Please Enter A Month.
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <label for="Year">Year<span style="color:red">*</span></label><br />
+                    <select asp-for="YearId" asp-items="Model.YearList" class="select2 custom-select form-control" id="Year" required autocomplete="off"></select>
+                    <div class="invalid-feedback">
+                        Please Enter A Year.
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="table">
+                        <thead>
+                            <tr style="background-color: #4CAF50; color: white; height: 2px; line-height: 2px; text-align: center">
+                                <th>Client</th>
+                                <th>Block</th>
+                                <th>Room</th>
+                                <th>Previous Unit</th>
+                                <th>Current Unit</th>
+                                <th>Unit</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.ElectricityDtos.Count() > 0)
+                            {
+                                for (int k = 0; k < Model.ElectricityDtos.Count(); k++)
+                                {
+                                    @Html.HiddenFor(x => x.ElectricityDtos[k].Id)
+                                    <tr>
+                                        <td>
+                                            @Html.DropDownListFor(x => x.ElectricityDtos[k].ClientId, Model.ClientList, new { @class = "form-control ClientId" })
+
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(x => x.ElectricityDtos[k].BlockId, Model.BlockList, new { @class = "form-control BlockId" })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(x => x.ElectricityDtos[k].RoomId, Model.RoomList, new { @class = "form-control RoomId" })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(x => x.ElectricityDtos[k].PreviousUnit, new { @class = "form-control PreviousUnit" })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(x => x.ElectricityDtos[k].CurrentUnit, new { @class = "form-control CurrentUnit" })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(x => x.ElectricityDtos[k].Unit, new { @class = "form-control Rate Unit" })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(x => x.ElectricityDtos[k].Rate, new { @class = "form-control Rate" })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(x => x.ElectricityDtos[k].Amount, new { @class = "form-control  Amount" })
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="form-group">
+                    <div class="col-md-12" style="text-align:right">
+                        <button type="submit" class="btn btn-success" id="btnSubmit"><i class="ti-check"></i>Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+@section Scripts
+{
+    <script type="text/javascript">
+    function loadUnit() {
+             $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: '@Url.Action("LoadUnit", "JsonRequest")',
+                    error: function () {
+
+                    },
+                 success: function (datathis) {
+                     var unit = datathis;
+                     $('.Rate').each(function () {
+                         $(this).val(unit);
+                     });
+                    }
+                })
+        }
+
+    $('#table tbody').on('change', '.CurrentUnit', function () {
+        var row = $(this).closest('tr');
+        var previousUnit = row.find('.PreviousUnit').val();
+        var currentUnit = row.find('.CurrentUnit').val();
+        var rate = row.find('.Rate').val();
+        if (previousUnit > 0 && currentUnit > 0) {
+            var unit = parseFloat(currentUnit) - parseFloat(previousUnit);
+            row.find('.Unit').val(unit);
+            var total = unit * rate;
+            row.find('.Amount').val(total);
+        }
+    })
+    $('#table tbody').on('change', '.PreviousUnit', function () {
+        var row = $(this).closest('tr');
+        var previousUnit = row.find('.PreviousUnit').val();
+        var currentUnit = row.find('.CurrentUnit').val();
+        if (previousUnit > 0 && currentUnit > 0) {
+            var unit = parseFloat(currentUnit) - parseFloat(previousUnit);
+            row.find('.Unit').val(unit);
+            var total = unit * rate;
+            row.find('.Amount').val(total);
+        }
+    })
+    </script>
+
+}

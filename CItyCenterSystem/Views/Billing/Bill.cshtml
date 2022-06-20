@@ -1,0 +1,562 @@
+﻿
+@{
+    DateTime? _currentDate = DateTime.Now;
+    var _currentNepDate = _currentDate.ToNepDate();
+    string yearName = _currentNepDate.Split("-")[0].Trim();
+    string monthOrder = _currentNepDate.Split("-")[1].Trim();
+
+
+    int SN = 1;
+    decimal totalAmount = 0;
+    string YearMonth = string.Empty;
+    var yearList = await _yearRepo.GetAllYearAsync();
+    var year = yearList.Where(x => x.YearName == yearName).FirstOrDefault();
+    var monthList = await _monthRepo.GetAllMonthAsync();
+    var month = monthList.Where(x => x.MonthOrder == monthOrder).FirstOrDefault();
+    var client = await _clientRepo.GetByIdAsync(long.Parse(ViewBag.ClientId));
+
+    var unitList = await _electricityUnitRepo.GetAllElectricityUnitSetupAsync();
+
+    var clientBlockList = await _clientBlockRepo.GetAllClientBlockRoomSetupAsync();
+    var clientBlock = clientBlockList.Where(x => x.ClientId == long.Parse(ViewBag.ClientId)).ToList();
+
+    var clientRoomMaintenanceList = await _clientRoomMaintenanceRepo.GetAllClientRoomMaintenanceAsync();
+}
+@inject FiboBlock.InfraStructure.Repository.IClientRepository _clientRepo;
+@inject FiboBlock.InfraStructure.Repository.IBlockRepository _blockRepo;
+@inject FiboBlock.InfraStructure.Repository.IRoomRepository _roomRepo;
+@inject FiboOffice.InfraStructure.Repository.IYearRepository _yearRepo;
+@inject FiboOffice.InfraStructure.Repository.IMonthRepository _monthRepo;
+@inject FiboBlock.InfraStructure.Repository.IElectricityUnitSetupRepository _electricityUnitRepo;
+@inject FiboBlock.InfraStructure.Repository.IClientBlockRoomSetupRepository _clientBlockRepo;
+@inject FiboBlock.InfraStructure.Repository.IClientRoomMaintenanceRepository _clientRoomMaintenanceRepo;
+
+
+@using FiboInfraStructure;
+
+<script type="text/javascript">
+    function CallPrint(strid) {
+        var mywindow = document.getElementById('profile');
+        var popupWin = window.open('', "Kaamana Format", 'width=350,height=150,location=no,left=200px');
+
+        popupWin.document.open();
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css"  href="../Content/bootstrap.min.css" /></head><body onload="window.print()">')
+        popupWin.document.write('<html><title>' + "" + '</title><link rel="stylesheet" type="text/css" href="../Content/print.css" /></head><body onload="window.print()">')
+        popupWin.document.write(mywindow.innerHTML);
+        popupWin.document.write('</html>');
+
+        popupWin.document.close();
+
+    }
+
+</script>
+<div class="row" style="text-align:right">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <button type="button" class="btn"
+                style="margin-bottom:20px;background-color:darkblue;padding-top: 3px;
+    padding-bottom: 5px;padding-left:5px;color:white;font-weight:bold"
+                onclick="CallPrint('strid')" data-ma-action="print">
+            <i class="mdi mdi-cloud-print"></i> Print
+        </button>
+    </div>
+</div>
+
+
+@if (ViewBag.ClientId != "null" && ViewBag.BlockId != "null" && ViewBag.RoomId != "null")
+{
+    var block = await _blockRepo.GetByIdAsync(long.Parse(ViewBag.BlockId));
+    var room = await _roomRepo.GetByIdAsync(long.Parse(ViewBag.RoomId));
+    var unit = unitList.Where(x => x.ClientId == long.Parse(ViewBag.ClientId) && x.BlockId == long.Parse(ViewBag.BlockId) && x.RoomId == long.Parse(ViewBag.RoomId) && x.YearId == year.Id && x.MonthId == month.Id).FirstOrDefault();
+    var clientRoomMaintenance = clientRoomMaintenanceList.Where(x => x.ClientId == long.Parse(ViewBag.ClientId) && x.RoomId == long.Parse(ViewBag.RoomId) && x.YearId == year.Id && x.MonthId == month.Id).FirstOrDefault();
+
+    <div class="col-sm-12" id="profile">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12" style="text-align: center;width: 100%;">
+                        <p>
+                            <b style="font-size:24px">Parichaya Awas Bikash Pvt. Ltd.</b>
+                        </p>
+                    </div>
+                    <div class="col-lg-12" style="text-align: center;width: 100%;">
+                        <p>
+                            Birtamode-5, Ph:-023-536567<br />megacomplexbtm@gmail.com<br />
+                            <b> Bill</b>
+                        </p>
+                    </div>
+                </div>
+                <table style="width: 100%;">
+                    <tr>
+                        <td>
+                            <b>Client Name :</b>
+                            @client.OwnerName
+
+                        </td>
+
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <b>Block No :</b>
+                            @block.Name
+                        </td>
+
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <b>Room No :</b>
+                            @room.Name
+                        </td>
+
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <b>Bill Date :</b>
+                            @{
+                                DateTime? dt = DateTime.Now;
+
+                            }
+                            @dt.ToNepDate()
+                        </td>
+
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <b>Billing By :</b>
+                            @User.Identity.Name
+                        </td>
+
+                    </tr>
+                </table>
+                <br />
+                <div class="table-responsive">
+                    <div class="tableFixHead">
+                        <table style="width: 100%;" border="1" class="table table-bordered">
+                            <thead>
+                                <tr style="text-align:center">
+                                    <th>
+                                        S.N
+                                    </th>
+                                    <th>
+                                        Room Rent
+                                    </th>
+                                    <th>
+                                        Maintenance
+                                    </th>
+                                    <th>
+                                        Previous Unit
+                                    </th>
+                                    <th>
+                                        Current Unit
+                                    </th>
+                                    <th>
+                                        Consume Unit
+                                    </th>
+                                    <th>
+                                        Unit Rate
+                                    </th>
+                                    <th>
+                                        Amount
+                                    </th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="vertical-align: top">
+                                        @SN
+                                    </td>
+                                    <td style="vertical-align:top;text-align:right">
+                                        @if (room != null)
+                                        {
+                                            if (room.MonthlyAmount > 0)
+                                            {
+                                                @room.MonthlyAmount
+                                            }
+                                        }
+                                    </td>
+                                    <td style="vertical-align:top;text-align:right">
+                                        @if (clientRoomMaintenance != null)
+                                        {
+                                            if (clientRoomMaintenance.MaintenanceCharge.ToDecimal() > 0)
+                                            {
+                                                @clientRoomMaintenance.MaintenanceCharge
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (unit != null)
+                                        {
+                                            if (!string.IsNullOrEmpty(unit.Unit))
+                                            {
+                                                @unit.PreviousUnit
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (unit != null)
+                                        {
+                                            if (!string.IsNullOrEmpty(unit.Unit))
+                                            {
+                                                @unit.CurrentUnit
+                                            }
+                                        }
+                                    </td>
+                                    <td style="vertical-align: top; text-align: right">
+                                        @if (unit != null)
+                                        {
+                                            if (!string.IsNullOrEmpty(unit.Unit))
+                                            {
+                                                @unit.Unit
+                                            }
+                                        }
+                                    </td>
+                                    <td style="vertical-align: top;text-align:right">
+                                        @if (unit != null)
+                                        {
+                                            if (!string.IsNullOrEmpty(unit.Amount))
+                                            {
+                                                @unit.Amount
+                                            }
+                                        }
+                                    </td>
+                                    <td style="vertical-align: top; text-align: right">
+                                        @{
+                                            decimal amt = 0;
+                                            if (unit != null)
+                                            {
+                                                if (unit.Amount.ToDecimal() > 0 && room.MonthlyAmount > 0)
+                                                {
+                                                    amt = room.MonthlyAmount + unit.Amount.ToDecimal();
+                                                }
+                                            }
+                                        }
+                                        <label class="amount">@amt</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="7" style="text-align:right">Due Amount</td>
+                                    <td style="text-align:right">
+                                        <label class="DueAmount"></label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="7" style="text-align:right">Total</td>
+                                    <td style="text-align:right">
+                                        <label id="total"></label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-sm-12" id="profile">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12" style="text-align: center;width: 100%;">
+                        <p>
+                            <b style="font-size:24px">Parichaya Awas Bikash Pvt. Ltd.</b>
+                        </p>
+                    </div>
+                    <div class="col-lg-12" style="text-align: center;width: 100%;">
+                        <p>
+                            Birtamode-5, Ph:-023-536567<br />megacomplexbtm@gmail.com<br />
+                            <b> Bill</b>
+                        </p>
+                    </div>
+                </div>
+                <table style="width: 100%;">
+                    <tr>
+                        <td>
+                            <b>Client Name :</b>
+                            @client.OwnerName
+                        </td>
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <b>Bill Date :</b>
+                            @{
+                                DateTime? dt = DateTime.Now;
+
+                            }
+                            @dt.ToNepDate()
+                        </td>
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <b>Billing By :</b>
+                            @User.Identity.Name
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <div class="table-responsive">
+                    <div class="tableFixHead">
+                        <table class="table table-bordered table-striped" BORDER="1" width="100%">
+                            <thead>
+                                <tr style="text-align:center">
+                                    <th>
+                                        S.N
+                                    </th>
+                                    <th>
+                                        Block No
+                                    </th>
+                                    <th>
+                                        Room No
+                                    </th>
+                                    <th>
+                                        Maintenance
+                                    </th>
+                                    <th>
+                                        Room Rent
+                                    </th>
+                                    @*<th>
+                                        Previous Unit
+                                    </th>*@
+                                    @*<th>
+                                        Current Unit
+                                    </th>*@
+                                    @*<th>
+                                        Unit Consumed
+                                    </th>*@
+                                    <th>
+                                        Unit Rate
+                                    </th>
+                                    <th>
+                                        Amount
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="vertical-align: top">
+                                        @SN
+                                    </td>
+                                    <td>
+                                        @foreach (var item in clientBlock)
+                                        {
+                                            var _tmpblock = await _blockRepo.GetByIdAsync((long)item.BlockId);
+                                            @_tmpblock.Name
+                                            <br /> <br />
+                                        }
+                                    </td>
+                                    <td>
+                                        <label class="lblRoom"></label>
+                                    </td>
+                                    <td>
+                                        <label class="Maintanance"></label>
+                                    </td>
+                                    <td style="vertical-align:top;text-align:right">
+                                        <label class="lblRoomRent"></label>
+                                    </td>
+                                    @*<td></td>*@
+                                    <td style="vertical-align: top; text-align: right">
+                                        @{
+
+                                            var _tmpunit = unitList.Where(x => x.ClientId == long.Parse(ViewBag.ClientId) && x.YearId == year.Id && x.MonthId == month.Id && x.RoomId == long.Parse(ViewBag.RoomId)).ToList();
+                                            foreach (var _data in _tmpunit)
+                                            {
+                                                @_data.Unit
+                                                <br /> <br />
+                                            }
+                                        }
+                                    </td>
+                                    @*<td>
+                                    </td>*@
+                                    <td style="vertical-align: top;text-align:right">
+                                        @{
+
+                                            var _unit = unitList.Where(x => x.ClientId == long.Parse(ViewBag.ClientId) && x.YearId == year.Id && x.MonthId == month.Id && x.RoomId==long.Parse(ViewBag.RoomId)).ToList();
+                                            foreach (var _data in _unit)
+                                            {
+                                                <label class="lblAmount">@_data.Amount</label>
+                                                <br />
+                                            }
+                                        }
+                                    </td>
+                                    <td style="vertical-align: top; text-align: right">
+
+                                        <label class="lblRoomRent"></label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="7" style="text-align:right">Due Amount</td>
+                                    <td style="text-align:right">
+                                        <label class="DueAmount"></label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="7" style="text-align:right">Total</td>
+                                    <td style="text-align:right">
+                                        <label id="lbltotal" class="lbltotal"></label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@section Scripts{
+    <script type="text/javascript">
+        $(window).on('load', function () {
+           $.ajax({
+                data: { id: @ViewBag.ClientId },
+                type: "GET",
+                dataType: "json",
+                url: '@Url.Action("LoadDueAmount", "Billing")',
+                error: function () {
+
+                },
+                success: function (datathis) {
+                    var due = datathis;
+                    var y = trimChar(due, "-");
+                    if (due.includes('-')) {
+                        $(".DueAmount").text(y);
+                        var total = parseFloat($(".DueAmount").text()) + parseFloat($(".amount").text());
+                        $("#total").text(total);
+                    }
+                    else {
+                        $(".DueAmount").text(0);
+
+                        $("#total").text($(".amount").text());
+                    }
+                }
+            });
+        });
+
+
+        var escapeRegExp = function (strToEscape) {
+            return strToEscape.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        };
+
+        var trimChar = function (origString, charToTrim) {
+            charToTrim = escapeRegExp(charToTrim);
+            var regEx = new RegExp("^[" + charToTrim + "]+|[" + charToTrim + "]+$", "g");
+            return origString.replace(regEx, "");
+        };
+
+    </script>
+    <script type="text/javascript">
+        var _tmpRooms;
+        $(document).ready(function () {
+            var clientId = @ViewBag.ClientId;
+            $.ajax({
+            data: { Id: clientId },
+            dataType: "Json",
+            type: "GET",
+            url: '@Url.Action("getRoomDetail", "Billing")',
+                success: function (rooms) {
+                    _tmpRooms = rooms;
+                    let i = 0;
+                    var html = "";
+                    var htmlRent = "";
+                    for (var room in rooms) {
+                        html += rooms[i].name + '</br></br>';
+                        htmlRent += rooms[i].monthlyAmount + '</br></br>';
+                        i++;
+                    }
+                    $('.lblRoom').append(html);
+                    $('.lblRoomRent').append(htmlRent);
+                }
+            })
+        });
+        var _tmpMaintenance;
+        $(document).ready(function () {
+            var clientId = @ViewBag.ClientId;
+            $.ajax({
+            data: { Id: clientId },
+            dataType: "Json",
+            type: "GET",
+            url: '@Url.Action("getMaintenanceCharge", "Billing")',
+                success: function (maintenance) {
+                    _tmpMaintenance = maintenance;
+                    let i = 0;
+                    var html = "";
+                    var htmlRent = "";
+                    for (var m in maintenance) {
+                        html += maintenance[i].maintenanceCharge + '</br></br>';
+                        i++;
+                    }
+                   // $('.lblRoom').append(html);
+                    $('.Maintanance').append(html);
+                }
+            })
+        });
+        $(window).on('load', function () {
+            var totalAmount = 0;
+            let k = 0;
+            $('.lblAmount').each(function () {
+                var amount = $(this).text();
+                var amt = parseFloat(amount);
+                var htmlAmount = "";
+                let i = 0;
+                for (var tmp in _tmpMaintenance) {
+                    if (k == i) {
+                        var _amount = amt + parseFloat(_tmpMaintenance[i].maintenanceCharge);
+                        htmlAmount += _amount + '</br></br>';
+                    }
+                    i++;
+                }
+                k++;
+                $('.lblTotalAmount').append(htmlAmount);
+            });
+        });
+        $(window).on('load', function () {
+            $.ajax({
+                data: { id: @ViewBag.ClientId },
+                type: "GET",
+                dataType: "json",
+                url: '@Url.Action("LoadDueAmount", "Billing")',
+                error: function () {
+
+                },
+                success: function (datathis) {
+                    var totalAmount = 0;
+                    let k = 0;
+                    var total = 0;
+                    $('.lblAmount').each(function () {
+                        var amount = $(this).text();
+                        var amt = parseFloat(amount);
+                        var htmlAmount = "";
+                        let i = 0;
+                        for (var tmp in _tmpMaintenance) {
+                            if (k == i) {
+                                total += amt + parseFloat(_tmpMaintenance[i].maintenanceCharge);
+                            }
+                            i++;
+                        }
+                        k++;
+                    });
+                    var due = datathis;
+                    var y = trimChar(due, "-");
+                    if (due.includes('-')) {
+                        $(".DueAmount").text(y);
+                        var _total = parseFloat($(".DueAmount").text()) + parseFloat(total);
+                        $('#lbltotal').text(_total);
+                    }
+                    else {
+                        $(".DueAmount").text(0);
+                        $('#lbltotal').text(total);
+                    }
+                }
+            });
+        });
+    </script>
+
+}

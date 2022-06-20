@@ -1,0 +1,133 @@
+﻿@model Payroll.Src.ViewModel.SalarySheetViewModel
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+    decimal? netsalary = 0;
+}
+@using FiboInfraStructure;
+@inject Payroll.InfraStructure.Repository.IEmployeeRepository _re;
+
+@using (Html.BeginForm("SalarySheetReport", "SalarySheet", FormMethod.Get, new { @class = "form-view-data" }))
+{
+    <div class="col-sm-12">
+        <div class="card">
+            <form asp-action="SalarySheetReport" asp-controller="SalarySheet" method="post">
+                <div class="card-body">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label>Employee Name</label><br />
+                                <select asp-for="EmployeeId" asp-items="Model.EmployeeList" class="select2 form-control custom-select">
+                                    <option>---Select Employee---</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-4">
+                                <div style="text-align:left">
+                                    <div class="btn btn-group">
+                                        <button type="submit" class="btn btn-success">Search</button>
+                                        <button type="button" class="btn btn-secondary" style="float: right"
+                                                onclick="window.location.href = '@Url.Action("ExportToExcel","SalarySheet")'">
+                                            Export Excel
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <hr />
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table class="table table-bordered">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+                                <th>Name</th>
+                                <th>Salary</th>
+                                <th style="text-align:center">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.SalarySheetVMList)
+                            {
+
+                                var employee = await _re.GetByIdAsync((long)item.EmployeeId);
+
+                                <tr>
+
+                                    <td>
+                                        @employee.Name
+                                    </td>
+                                    <td>@employee.BasicSalary</td>
+                                    <td style="text-align:center">
+
+                                        <div class="overlay-edit">
+
+                                            <a href="@Url.Action("MonthlyReport","SalarySheet", new { id=item.EmployeeId, actionName="Report" })" data-toggle="tooltip" title="Monthly Report!"><i class="ti-eye" aria-hidden="true" style="font-size:21px; text-align:center"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" id="DeleteBody">
+
+        <!-- /.modal-content -->
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@section Scripts
+{
+    <script type="text/javascript">
+        $("#myModal").on('show.bs.modal', function (ke) {
+            const SalaryId = $(ke.relatedTarget).attr('SalaryId');
+            const type = $(ke.relatedTarget).attr('ReferenceType');
+            if (SalaryId > 0) {
+                if (type == null) {
+                    var url = '@Url.Action("Delete", "SalarySheet")' + "?id=" + SalaryId;
+                    $("#DeleteBody").load(url, function () {
+
+                        $("#myModal").modal('show');
+                    });
+                }
+                else {
+                    var url = '@Url.Action("Update", "SalarySheet")' + "?id=" + SalaryId;
+                    $("#DeleteBody").load(url, function () {
+
+                        $("#myModal").modal('show');
+                    });
+                }
+            }
+            else {
+                 var url = '@Url.Action("Create", "SalarySheet")';
+                 $("#DeleteBody").load(url, function () {
+
+                     $("#myModal").modal('show');
+                 });
+             }
+        })
+
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}
+
+

@@ -1,0 +1,50 @@
+﻿@model FiboBlock.Src.ViewModel.BlockViewModel
+
+@{ Layout = null;
+    //var block = await _blockrepo.GetAllBlockAsync();
+    //var blocks = block.Where(x => x.Id == Model.BlockId).FirstOrDefault();
+    //var room = await _roomrepo.GetAllRoomAsync();
+    //var rooms = room.Where(x => x.Id == Model.RoomId).FirstOrDefault();
+}
+@*@inject FiboBlock.InfraStructure.Repository.IBlockRepository _blockrepo;
+@inject FiboBlock.InfraStructure.Repository.IRoomRepository _roomrepo;*@ 
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title" style="font-size:15px">
+            
+          
+                <label>Block Name:</label>
+                @Model.blocks.Name
+
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="ti-close"></i></span></button>
+    </div>
+    <div class="modal-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        Room Name
+                    </th>
+                    <th>
+                        Monthly Charge
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rooms in Model.Roooms)
+                {
+                    
+                <tr>
+                    <td>
+                        @rooms.Name
+                    </td>
+                    <td>
+                        @rooms.MonthlyAmount
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

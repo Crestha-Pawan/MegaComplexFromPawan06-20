@@ -1,0 +1,178 @@
+﻿@model Payroll.Src.ViewModel.SalarySheetViewModel
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index"; }
+@inject Payroll.InfraStructure.Repository.IEmployeeRepository _employeeRepository;
+@inject Payroll.InfraStructure.Repository.IPostRepository _postRepository;
+
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <a class="btn btn-success" type="button" asp-action="Create" asp-controller="SalarySheet"><i class="feather icon-plus-circle"></i> Create New</a>
+            <hr />
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table class="table table-bordered">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+
+                                <th>Name</th>
+                                <th>Post</th>
+                                <th>Salary</th>
+                                <th>Deduction</th>
+                                <th>Bonus</th>
+                                <th>Net Salary</th>
+                                <th style="width:120px">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.SalarySheets)
+                            {
+
+                                var employee = await _employeeRepository.GetByIdAsync((long)item.EmployeeId);
+                                var post = await _postRepository.GetByIdAsync((long)item.PostId);
+                                <tr>
+
+                                    <td>
+                                        @if (item.EmployeeId.HasValue)
+                                        {
+                                            var emp = await _employeeRepository.GetByIdAsync((long)item.EmployeeId);
+                                            @emp.Name
+                                        }
+
+                                    </td>
+                                    <td>
+                                        @if (item.PostId.HasValue)
+                                        {
+                                            var pos = await _postRepository.GetByIdAsync((long)item.PostId);
+                                            @pos.Name
+                                        }
+
+                                    </td>
+
+                                    <td>@item.BasicSalary</td>
+                                    <td>@item.Deduction</td>
+                                    <td>@item.Bonus</td>
+                                    <td>@item.NetSalary</td>
+
+
+                                    <td style="text-align:center">
+
+                                        <div class="bx-plus">
+                                            <a type="button" class="btn-sm btn-icon btn-secondary" asp-action="Update" asp-controller="SalarySheet" asp-route-id="@item.Id">
+                                                <i class="icon feather icon-edit f-16 text-c-green"></i>
+                                            </a>
+                                            <button class="btn-xs btn-danger" data-toggle="modal" SalaryId="@item.Id" data-target="#myModal"><i class="feather icon-trash-2"></i></button>
+                                            <a class="btn-sm btn-icon btn-success" asp-action="AddSalary" asp-controller="SalarySheet" asp-route-id="@item.Id"><i class="feather icon-plus-circle"> Add salary</i> </a>
+                                            <a class="btn-sm btn-icon btn-block" asp-action="AdvanceSalary" asp-controller="SalarySheet" asp-route-id="@item.Id"><i class="feather icon-plus-circle">Advance Salary</i> </a>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" id="DeleteBody">
+
+        <!-- /.modal-content -->
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@section Scripts
+{
+    <script type="text/javascript">
+        $("#myModal").on('show.bs.modal', function (ke) {
+            const SalaryId = $(ke.relatedTarget).attr('SalaryId');
+            const type = $(ke.relatedTarget).attr('ReferenceType');
+            if (SalaryId > 0) {
+                if (type == null) {
+                    var url = '@Url.Action("Delete", "SalarySheet")' + "?id=" + SalaryId;
+                    $("#DeleteBody").load(url, function () {
+
+                        $("#myModal").modal('show');
+                    });
+                }
+                else {
+                    var url = '@Url.Action("Update", "SalarySheet")' + "?id=" + SalaryId;
+                    $("#DeleteBody").load(url, function () {
+
+                        $("#myModal").modal('show');
+                    });
+                }
+            }
+            else {
+                 var url = '@Url.Action("Create", "SalarySheet")';
+                 $("#DeleteBody").load(url, function () {
+
+                     $("#myModal").modal('show');
+                 });
+             }
+        })
+
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(message,type) {
+            $.growl({
+                message: message
+            }, {
+                type: type,
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {from: 'top', align: 'right'},
+                delay: 2500,
+                animate: { enter: 'animated rotateIn', exit: 'animated rotateIn'},
+                offset: {x: 30,y: 30}
+            });
+        };
+        notify('@ViewBag.Message','success');
+    });
+
+    </script>
+}
+
+@if (ViewBag.Messege != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(messege,type) {
+            $.growl({
+                message: messege
+            }, {
+                type: type,
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {from: 'top', align: 'right'},
+                delay: 2500,
+                animate: { enter: 'animated rotateIn', exit: 'animated rotateIn'},
+                offset: {x: 30,y: 30}
+            });
+        };
+        notify('@ViewBag.Messege','danger');
+    });
+
+    </script>
+}
+

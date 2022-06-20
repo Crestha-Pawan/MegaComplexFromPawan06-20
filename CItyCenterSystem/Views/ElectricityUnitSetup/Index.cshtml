@@ -1,0 +1,173 @@
+﻿@model FiboBlock.Src.ViewModel.ElectricityUnitSetupViewModel
+@{Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index"; }
+@inject FiboBlock.InfraStructure.Repository.IBlockRepository _blockrepo;
+@inject FiboBlock.InfraStructure.Repository.IRoomRepository _roomrepo;
+@inject FiboBlock.InfraStructure.Repository.IClientRepository _clientrepo;
+@inject FiboOffice.InfraStructure.Repository.IYearRepository _yearRepo;
+@inject FiboOffice.InfraStructure.Repository.IMonthRepository _monthRepo;
+
+<div class="col-lg-12">
+    <div class="card">
+        <div class="card-body">
+            @using (Html.BeginForm("Index", "ElectricityUnitSetup", FormMethod.Get, new { @class = "form-view-data" }))
+            {
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="ClientName">Client Name<br /><span style="color:red" id="message"></span></label><br />
+                                    <select asp-for="ClientId" asp-items="Model.ClientSelectList" class="select2 custom-select form-control ClientId"></select>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label for="Block">Block<br /><span style="color:red" id="message"></span></label><br />
+                                    <select asp-for="BlockId" asp-items="Model.BlockList" class="select2 custom-select form-control BlockId"></select>
+                                </div>
+                                <div class="btn btn-group">
+                                    <button type="submit" class="btn btn-success">Search</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+<div class="col-lg-12">
+    <div class="card">
+        <div class="card-body">
+            <div style="text-align:left">
+                <a class="btn btn-success" asp-action="Create" asp-controller="ElectricityUnitSetup"><i class="ti-plus"></i> Create New</a>
+            </div>
+            <hr />
+            <div class="table-responsive">
+                <div class="tableFixHead">
+                    <table class="table table-bordered">
+                        <thead style="background-color: #FFFFFFCC;">
+                            <tr>
+                                <th>
+                                    Year/Month
+                                </th>
+                                <th>Block Name</th>
+                                <th>Room Name</th>
+                                <th>Client Name</th>
+                                <th>Unit</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Electricities)
+                            {
+                                var block = await _blockrepo.GetByIdAsync((long)item.BlockId);
+                                var room = await _roomrepo.GetByIdAsync((long)item.RoomId);
+                                var client = await _clientrepo.GetByIdAsync((long)item.ClientId);
+                                <tr>
+                                    <td>
+                                        @{
+                                            var year = await _yearRepo.GetByIdAsync((long)item.YearId);
+                                            var month = await _monthRepo.GetByIdAsync((long)item.MonthId);
+                                            var YearMonth = string.Format("{0}/{1}", year.YearName, month.MonthName);
+
+                                        }
+                                        @YearMonth
+                                    </td>
+                                    <td>
+                                        @if (item.BlockId != null)
+                                        {
+                                            @block.Name
+                                        }
+                                    </td>
+                                    <td>
+                                        @room.Name
+                                    </td>
+                                    <td>
+                                        @client.OwnerName
+                                    </td>
+                                    <td>
+                                        @item.Unit
+                                    </td>
+                                    <td>
+                                        @item.Rate
+                                    </td>
+                                    <td>@item.Amount</td>
+                                    <td style="text-align:center">
+                                        <div class="overlay-edit">
+                                            <div class="btn-group-sm">
+                                                <a type="button" class=" btn btn-secondary" asp-action="Update" asp-controller="ElectricityUnitSetup" asp-route-id="@item.Id"><i class="ti-pencil-alt"></i></a>
+                                                <a type="button" class=" btn btn-danger" href="#!" data-toggle="modal" RoomId="@item.Id" data-target="#myModal"><i class="ti-trash"></i></a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+    'use strict';
+    $(window).on('load', function () {
+        function notify(message,type) {
+            $.growl({
+                message: message
+            }, {
+                type: type,
+                allow_dismiss: false,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {from: 'top', align: 'right'},
+                delay: 2500,
+                animate: { enter: 'animated rotateIn', exit: 'animated rotateIn'},
+                offset: {x: 30,y: 30}
+            });
+        };
+        notify('@ViewBag.Message','success');
+    });
+
+    </script>
+}
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                $(".ClientId").change();
+            });
+
+        });
+    </script>
+    <script type="text/javascript">
+       $(".ClientId").change(function () {
+            var Id = $("#ClientId").val();
+            $.ajax({
+                data: { Id: Id },
+                dataType: "Json",
+                type: "GET",
+                url: '@Url.Action("LoadRoomBlock", "Billing")',
+                success: function (blocks) {
+                    debugger;
+                    $('#BlockId').empty();
+                    let i = 0;
+                    for (var client in blocks) {
+                        var html = '<option value="' + blocks[i].id + '">' + blocks[i].name + '</option>';
+                        $('#BlockId').append(html);
+                        i++;
+                    }
+                }
+            });
+       });
+    </script>
+}

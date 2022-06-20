@@ -1,0 +1,106 @@
+﻿@model FiboBlock.Src.Dto.ClientBlockRoomSetupDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Create";
+}
+<form asp-action="Create" asp-controller="ClientBlockRoomSetup" method="post" class="needs-validation" novalidate>
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0 text-black-50">Create </h4>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="form-group">
+                                    <label for="ClientName">Client Name<br /><span style="color:red" id="message"></span></label><br />
+                                    <select asp-for="ClientId" asp-items="Model.Clientlist" class="select2 custom-select form-control ClientId" required></select>
+                                    <div class="invalid-feedback">
+                                        Please Enter A Client Name.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <table class="table table-bordered" id="table">
+                                <thead>
+
+                                    <tr style="background-color: #4CAF50; color: white; height: 2px; line-height: 2px; text-align: center">
+
+                                        <th style="width:10%">Block</th>
+                                        <th style="width:10%">Room</th>
+                                        <th style="width:10%">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="form-group">
+                            <div id="addrow">
+                                <button type="button" class="btnPlus btn btn-success" style="color:white"><i class="ti-plus"></i>Add</button>
+                            </div>
+                            <div class="col-md-12" style="text-align:right">
+                                <button type="submit" class="btn btn-success" id="btnSubmit"><i class="ti-check"></i>Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+@section Scripts{
+    <script src="~/js/chosen.jquery.js"></script>
+    <link href="~/css/bootstrap-chosen.css" rel="stylesheet" />
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function newRow() {
+                var count = $('.listrow').length;
+                var row =
+                    '<tr class="listrow">' +
+                    '<td style="width:8%"><select name="clientBlockRoomSetupDtos[' + count + '].BlockId" class="BlockId form-control" style="height:30px;width:100%">@foreach (var item in Model.Blocks) {<option value="@item.Id">@item.Name</option>}</select></td>' +
+                    '<td><select name="clientBlockRoomSetupDtos[' + count + '].RoomList" multiple="multiple" id="multipleDropDown" class="select2 custom-select multipleDropDown form-control" style="height:30px;width:100%">@foreach (var item in Model.Rooms) {<option value="@item.Id">@item.Name</option>}</select></td>' +
+                    '<td style="text-align:center"><a href="#!" class="BtnMinus  btn-icon btn-sm btn-danger btn-sm " value="x" ><i class="ti-trash"> </i></td>'
+                                 +
+                    '</tr>'
+
+                $("#table").append(row);
+                $(".multipleDropDown").chosen({ width: '100%' });
+            }
+            $("#addrow").on("click", ".btnPlus", newRow);
+
+            function deleteRow() {
+                var par = $(this).parent().parent();
+                par.remove();
+            };
+
+            $("#table").on("click", ".BtnMinus", deleteRow);
+        });
+
+
+    </script>
+
+    <script type="text/javascript">
+
+        $(document).on('invalid-form.validate', 'form', function () {
+            var button = $(this).find(':submit');
+            setTimeout(function () {
+                button.removeAttr('disabled');
+            }, 1);
+        });
+        $(document).on('submit', 'form', function () {
+            var button = $(this).find(':submit');
+            setTimeout(function () {
+                button.attr('disabled', 'disabled');
+            }, 0);
+        });
+    </script>
+}
